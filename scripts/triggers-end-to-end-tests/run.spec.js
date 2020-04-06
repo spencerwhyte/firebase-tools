@@ -179,7 +179,7 @@ TriggerEndToEndTest.prototype.stopEmulators = function stopEmulators(done) {
 };
 
 TriggerEndToEndTest.prototype.invokeHttpFunction = function invokeHttpFunction(name, done) {
-  var url =
+  const url =
     "http://localhost:" +
     [this.functions_emulator_port, FIREBASE_PROJECT, FIREBASE_PROJECT_ZONE, name].join("/");
 
@@ -212,7 +212,7 @@ TriggerEndToEndTest.prototype.writeToScheduledPubsub = function writeToScheduled
 
 TriggerEndToEndTest.prototype.waitForCondition = function(conditionFn, timeout, callback) {
   let elapsed = 0;
-  let interval = 10;
+  const interval = 10;
   const id = setInterval(() => {
     elapsed += interval;
     if (elapsed > timeout) {
@@ -234,7 +234,7 @@ function readConfig(done) {
       done(err);
       return;
     }
-    var config;
+    let config;
     try {
       config = JSON.parse(data);
     } catch (err) {
@@ -246,7 +246,7 @@ function readConfig(done) {
 }
 
 describe("database and firestore emulator function triggers", function() {
-  var test;
+  let test;
 
   before(function(done) {
     this.timeout(TEST_SETUP_TIMEOUT);
@@ -411,7 +411,7 @@ describe("database and firestore emulator function triggers", function() {
 });
 
 describe("pubsub emulator function triggers", function() {
-  var test;
+  let test;
 
   before(function(done) {
     this.timeout(TEST_SETUP_TIMEOUT);

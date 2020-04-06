@@ -31,7 +31,7 @@ function logProjectsList(projects: FirebaseProjectMetadata[], currentProjectId: 
   logger.info(table.toString());
 }
 
-function logProjectCount(count: number = 0): void {
+function logProjectCount(count = 0): void {
   if (count === 0) {
     return;
   }

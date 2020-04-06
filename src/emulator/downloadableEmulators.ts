@@ -171,7 +171,7 @@ function _getCommand(
 
   const cmdLineArgs = baseCmd.args.slice();
   Object.keys(args).forEach((key) => {
-    if (baseCmd.optionalArgs.indexOf(key) < 0) {
+    if (!baseCmd.optionalArgs.includes(key)) {
       logger.debug(`Ignoring unsupported arg: ${key}`);
       return;
     }

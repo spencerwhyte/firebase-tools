@@ -1,25 +1,25 @@
 "use strict";
 
-var fs = require("fs");
-var path = require("path");
+const fs = require("fs");
+const path = require("path");
 
-var tar = require("tar");
-var tmp = require("tmp");
+const tar = require("tar");
+const tmp = require("tmp");
 
-var { listFiles } = require("./listFiles");
-var { FirebaseError } = require("./error");
-var fsutils = require("./fsutils");
+const { listFiles } = require("./listFiles");
+const { FirebaseError } = require("./error");
+const fsutils = require("./fsutils");
 
 module.exports = function(options) {
-  var hostingConfig = options.config.get("hosting");
-  var publicDir = options.config.path(hostingConfig.public);
-  var indexPath = path.join(publicDir, "index.html");
+  const hostingConfig = options.config.get("hosting");
+  const publicDir = options.config.path(hostingConfig.public);
+  const indexPath = path.join(publicDir, "index.html");
 
-  var tmpFile = tmp.fileSync({
+  const tmpFile = tmp.fileSync({
     prefix: "firebase-upload-",
     postfix: ".tar.gz",
   });
-  var manifest = listFiles(publicDir, hostingConfig.ignore);
+  const manifest = listFiles(publicDir, hostingConfig.ignore);
 
   return tar
     .c(
@@ -35,7 +35,7 @@ module.exports = function(options) {
       manifest.slice(0)
     )
     .then(function() {
-      var stats = fs.statSync(tmpFile.name);
+      const stats = fs.statSync(tmpFile.name);
       return {
         file: tmpFile.name,
         stream: fs.createReadStream(tmpFile.name),

@@ -1,17 +1,17 @@
 "use strict";
 
-var clc = require("cli-color");
+const clc = require("cli-color");
 
-var rtdb = require("../../rtdb");
-var utils = require("../../utils");
+const rtdb = require("../../rtdb");
+const utils = require("../../utils");
 
 module.exports = function(context) {
   if (!context.database || !context.database.deploys || !context.database.ruleFiles) {
     return Promise.resolve();
   }
 
-  var deploys = context.database.deploys;
-  var ruleFiles = context.database.ruleFiles;
+  const deploys = context.database.deploys;
+  const ruleFiles = context.database.ruleFiles;
 
   utils.logBullet(clc.bold.cyan("database: ") + "releasing rules...");
   return Promise.all(

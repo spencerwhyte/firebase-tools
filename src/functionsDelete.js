@@ -1,28 +1,28 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
+const _ = require("lodash");
+const clc = require("cli-color");
 
-var cloudfunctions = require("./gcp/cloudfunctions");
-var cloudscheduler = require("./gcp/cloudscheduler");
-var FirebaseError = require("./error");
-var helper = require("./functionsDeployHelper");
-var logger = require("./logger");
-var pubsub = require("./gcp/pubsub");
-var track = require("./track");
-var utils = require("./utils");
+const cloudfunctions = require("./gcp/cloudfunctions");
+const cloudscheduler = require("./gcp/cloudscheduler");
+const FirebaseError = require("./error");
+const helper = require("./functionsDeployHelper");
+const logger = require("./logger");
+const pubsub = require("./gcp/pubsub");
+const track = require("./track");
+const utils = require("./utils");
 
-var deletes = [];
-var failedDeployments = 0;
+let deletes = [];
+let failedDeployments = 0;
 
-var printSuccess = function(op) {
+const printSuccess = function(op) {
   utils.logSuccess(
     clc.bold.green("functions[" + helper.getFunctionLabel(op.func) + "]: ") +
       "Successful deletion. "
   );
 };
 
-var printFail = function(op) {
+const printFail = function(op) {
   failedDeployments += 1;
   utils.logWarning(
     clc.bold.yellow("functions[" + helper.getFunctionLabel(op.func) + "]: ") + "Deployment error."
@@ -38,7 +38,7 @@ var printFail = function(op) {
   }
 };
 
-var printTooManyOps = function(projectId) {
+const printTooManyOps = function(projectId) {
   utils.logWarning(
     clc.bold.yellow("functions:") +
       " too many functions are being deleted at once, cannot poll status."
@@ -102,12 +102,12 @@ module.exports = function(functionsToDelete, projectId, appEngineLocation) {
       })
     )
     .then(function(operations) {
-      var successfulCalls = _.chain(operations)
+      const successfulCalls = _.chain(operations)
         .filter({ state: "fulfilled" })
         .map("value")
         .value();
 
-      var failedCalls = _.chain(operations)
+      const failedCalls = _.chain(operations)
         .filter({ state: "rejected" })
         .map("reason")
         .value();

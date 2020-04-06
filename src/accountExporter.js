@@ -1,13 +1,13 @@
 "use strict";
 
-var os = require("os");
-var path = require("path");
-var _ = require("lodash");
+const os = require("os");
+const path = require("path");
+const _ = require("lodash");
 
-var api = require("./api");
-var utils = require("./utils");
+const api = require("./api");
+const utils = require("./utils");
 
-var EXPORTED_JSON_KEYS = [
+const EXPORTED_JSON_KEYS = [
   "localId",
   "email",
   "emailVerified",
@@ -20,18 +20,24 @@ var EXPORTED_JSON_KEYS = [
   "phoneNumber",
   "disabled",
 ];
-var EXPORTED_JSON_KEYS_RENAMING = {
+const EXPORTED_JSON_KEYS_RENAMING = {
   lastLoginAt: "lastSignedInAt",
 };
-var EXPORTED_PROVIDER_USER_INFO_KEYS = ["providerId", "rawId", "email", "displayName", "photoUrl"];
-var PROVIDER_ID_INDEX_MAP = {
+const EXPORTED_PROVIDER_USER_INFO_KEYS = [
+  "providerId",
+  "rawId",
+  "email",
+  "displayName",
+  "photoUrl",
+];
+const PROVIDER_ID_INDEX_MAP = {
   "google.com": 7,
   "facebook.com": 11,
   "twitter.com": 15,
   "github.com": 19,
 };
 
-var _escapeComma = function(str) {
+const _escapeComma = function(str) {
   if (str.indexOf(",") !== -1) {
     // Encapsulate the string with quotes if it contains a comma.
     return `"${str}"`;
@@ -39,19 +45,19 @@ var _escapeComma = function(str) {
   return str;
 };
 
-var _convertToNormalBase64 = function(data) {
+const _convertToNormalBase64 = function(data) {
   return data.replace(/_/g, "/").replace(/-/g, "+");
 };
 
-var _addProviderUserInfo = function(providerInfo, arr, startPos) {
+const _addProviderUserInfo = function(providerInfo, arr, startPos) {
   arr[startPos] = providerInfo.rawId;
   arr[startPos + 1] = providerInfo.email || "";
   arr[startPos + 2] = _escapeComma(providerInfo.displayName || "");
   arr[startPos + 3] = providerInfo.photoUrl || "";
 };
 
-var _transUserToArray = function(user) {
-  var arr = Array(27).fill("");
+const _transUserToArray = function(user) {
+  const arr = Array(27).fill("");
   arr[0] = user.localId;
   arr[1] = user.email || "";
   arr[2] = user.emailVerified || false;
@@ -59,8 +65,8 @@ var _transUserToArray = function(user) {
   arr[4] = _convertToNormalBase64(user.salt || "");
   arr[5] = _escapeComma(user.displayName || "");
   arr[6] = user.photoUrl || "";
-  for (var i = 0; i < (!user.providerUserInfo ? 0 : user.providerUserInfo.length); i++) {
-    var providerInfo = user.providerUserInfo[i];
+  for (let i = 0; i < (!user.providerUserInfo ? 0 : user.providerUserInfo.length); i++) {
+    const providerInfo = user.providerUserInfo[i];
     if (providerInfo && PROVIDER_ID_INDEX_MAP[providerInfo.providerId]) {
       _addProviderUserInfo(providerInfo, arr, PROVIDER_ID_INDEX_MAP[providerInfo.providerId]);
     }
@@ -72,10 +78,10 @@ var _transUserToArray = function(user) {
   return arr;
 };
 
-var _transUserJson = function(user) {
-  var newUser = {};
+const _transUserJson = function(user) {
+  const newUser = {};
   _.each(_.pick(user, EXPORTED_JSON_KEYS), function(value, key) {
-    var newKey = EXPORTED_JSON_KEYS_RENAMING[key] || key;
+    const newKey = EXPORTED_JSON_KEYS_RENAMING[key] || key;
     newUser[newKey] = value;
   });
   if (newUser.passwordHash) {
@@ -96,18 +102,18 @@ var _transUserJson = function(user) {
   return newUser;
 };
 
-var validateOptions = function(options, fileName) {
-  var exportOptions = {};
+const validateOptions = function(options, fileName) {
+  const exportOptions = {};
   if (fileName === undefined) {
     return utils.reject("Must specify data file", { exit: 1 });
   }
-  var extName = path.extname(fileName.toLowerCase());
+  const extName = path.extname(fileName.toLowerCase());
   if (extName === ".csv") {
     exportOptions.format = "csv";
   } else if (extName === ".json") {
     exportOptions.format = "json";
   } else if (options.format) {
-    var format = options.format.toLowerCase();
+    const format = options.format.toLowerCase();
     if (format === "csv" || format === "json") {
       exportOptions.format = format;
     } else {
@@ -121,8 +127,8 @@ var validateOptions = function(options, fileName) {
   return exportOptions;
 };
 
-var _createWriteUsersToFile = function() {
-  var jsonSep = "";
+const _createWriteUsersToFile = function() {
+  let jsonSep = "";
   return function(userList, format, writeStream) {
     userList.map(function(user) {
       if (user.passwordHash && user.version !== 0) {
@@ -144,7 +150,7 @@ var serialExportUsers = function(projectId, options) {
   if (!options.writeUsersToFile) {
     options.writeUsersToFile = _createWriteUsersToFile();
   }
-  var postBody = {
+  const postBody = {
     targetProjectId: projectId,
     maxResults: options.batchSize,
   };
@@ -163,7 +169,7 @@ var serialExportUsers = function(projectId, options) {
     })
     .then(function(ret) {
       options.timeoutRetryCount = 0;
-      var userList = ret.body.users;
+      const userList = ret.body.users;
       if (userList && userList.length > 0) {
         options.writeUsersToFile(userList, options.format, options.writeStream);
         utils.logSuccess("Exported " + userList.length + " account(s) successfully.");
@@ -188,7 +194,7 @@ var serialExportUsers = function(projectId, options) {
     });
 };
 
-var accountExporter = {
+const accountExporter = {
   validateOptions: validateOptions,
   serialExportUsers: serialExportUsers,
 };

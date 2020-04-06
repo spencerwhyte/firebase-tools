@@ -1,24 +1,24 @@
 "use strict";
 
-var _ = require("lodash");
-var fs = require("fs");
-var path = require("path");
+const _ = require("lodash");
+const fs = require("fs");
+const path = require("path");
 
-var npmDependencies = require("./npm-dependencies");
-var { prompt } = require("../../../prompt");
+const npmDependencies = require("./npm-dependencies");
+const { prompt } = require("../../../prompt");
 
-var TEMPLATE_ROOT = path.resolve(__dirname, "../../../../templates/init/functions/javascript/");
-var INDEX_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "index.js"), "utf8");
-var PACKAGE_LINTING_TEMPLATE = fs.readFileSync(
+const TEMPLATE_ROOT = path.resolve(__dirname, "../../../../templates/init/functions/javascript/");
+const INDEX_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "index.js"), "utf8");
+const PACKAGE_LINTING_TEMPLATE = fs.readFileSync(
   path.join(TEMPLATE_ROOT, "package.lint.json"),
   "utf8"
 );
-var PACKAGE_NO_LINTING_TEMPLATE = fs.readFileSync(
+const PACKAGE_NO_LINTING_TEMPLATE = fs.readFileSync(
   path.join(TEMPLATE_ROOT, "package.nolint.json"),
   "utf8"
 );
-var ESLINT_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "eslint.json"), "utf8");
-var GITIGNORE_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "_gitignore"), "utf8");
+const ESLINT_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "eslint.json"), "utf8");
+const GITIGNORE_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "_gitignore"), "utf8");
 
 module.exports = function(setup, config) {
   return prompt(setup.functions, [

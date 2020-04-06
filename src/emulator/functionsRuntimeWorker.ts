@@ -113,7 +113,7 @@ export class RuntimeWorker {
     this.stateEvents.emit(this._state);
   }
 
-  onLogs(listener: LogListener, forever: boolean = false) {
+  onLogs(listener: LogListener, forever = false) {
     if (!forever) {
       this.logListeners.push(listener);
     }

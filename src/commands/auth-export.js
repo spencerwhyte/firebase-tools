@@ -1,19 +1,19 @@
 "use strict";
 
-var clc = require("cli-color");
-var fs = require("fs");
-var os = require("os");
+const clc = require("cli-color");
+const fs = require("fs");
+const os = require("os");
 
-var { Command } = require("../command");
-var accountExporter = require("../accountExporter");
-var getProjectId = require("../getProjectId");
-var logger = require("../logger");
-var { requirePermissions } = require("../requirePermissions");
+const { Command } = require("../command");
+const accountExporter = require("../accountExporter");
+const getProjectId = require("../getProjectId");
+const logger = require("../logger");
+const { requirePermissions } = require("../requirePermissions");
 
-var MAX_BATCH_SIZE = 1000;
+const MAX_BATCH_SIZE = 1000;
 
-var validateOptions = accountExporter.validateOptions;
-var serialExportUsers = accountExporter.serialExportUsers;
+const validateOptions = accountExporter.validateOptions;
+const serialExportUsers = accountExporter.serialExportUsers;
 
 module.exports = new Command("auth:export [dataFile]")
   .description("Export accounts from your Firebase project into a data file")
@@ -23,13 +23,13 @@ module.exports = new Command("auth:export [dataFile]")
   )
   .before(requirePermissions, ["firebaseauth.users.get"])
   .action(function(dataFile, options) {
-    var projectId = getProjectId(options);
-    var checkRes = validateOptions(options, dataFile);
+    const projectId = getProjectId(options);
+    const checkRes = validateOptions(options, dataFile);
     if (!checkRes.format) {
       return checkRes;
     }
-    var exportOptions = checkRes;
-    var writeStream = fs.createWriteStream(dataFile);
+    const exportOptions = checkRes;
+    const writeStream = fs.createWriteStream(dataFile);
     if (exportOptions.format === "json") {
       writeStream.write('{"users": [' + os.EOL);
     }

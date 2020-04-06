@@ -1,14 +1,14 @@
 "use strict";
 
-var fs = require("fs");
-var spawn = require("cross-spawn");
-var { FirebaseError } = require("./error");
-var clc = require("cli-color");
+const fs = require("fs");
+const spawn = require("cross-spawn");
+const { FirebaseError } = require("./error");
+const clc = require("cli-color");
 
 module.exports = function(filename) {
-  var ruleSrc = fs.readFileSync(filename, "utf8");
+  const ruleSrc = fs.readFileSync(filename, "utf8");
 
-  var result = spawn.sync("firebase-bolt", {
+  const result = spawn.sync("firebase-bolt", {
     input: ruleSrc,
     timeout: 10000,
     encoding: "utf-8",

@@ -1,15 +1,15 @@
 "use strict";
 
-var chai = require("chai");
-var expect = chai.expect;
+const chai = require("chai");
+const expect = chai.expect;
 
-var LocalFunction = require("../localFunction");
+const LocalFunction = require("../localFunction");
 
 describe("localFunction._constructAuth", function() {
-  var lf = new LocalFunction({});
+  const lf = new LocalFunction({});
 
   describe("#_constructAuth", function() {
-    var constructAuth = lf._constructAuth;
+    const constructAuth = lf._constructAuth;
 
     it("warn if opts.auth and opts.authType are conflicting", function() {
       expect(function() {
@@ -41,13 +41,13 @@ describe("localFunction._constructAuth", function() {
     });
 
     it("leaves auth untouched if it already follows wire format", function() {
-      var auth = { variable: { uid: "something" } };
+      const auth = { variable: { uid: "something" } };
       expect(constructAuth(auth)).to.deep.equal(auth);
     });
   });
 
   describe("localFunction._makeFirestoreValue", function() {
-    var makeFirestoreValue = lf._makeFirestoreValue;
+    const makeFirestoreValue = lf._makeFirestoreValue;
 
     it("returns {} when there is no data", function() {
       expect(makeFirestoreValue()).to.deep.equal({});

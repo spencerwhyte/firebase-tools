@@ -1,13 +1,13 @@
 "use strict";
 
-var clc = require("cli-color");
-var { Command } = require("../command");
-var functionsConfig = require("../functionsConfig");
-var functionsConfigClone = require("../functionsConfigClone");
-var getProjectId = require("../getProjectId");
-var { requirePermissions } = require("../requirePermissions");
-var utils = require("../utils");
-var logger = require("../logger");
+const clc = require("cli-color");
+const { Command } = require("../command");
+const functionsConfig = require("../functionsConfig");
+const functionsConfigClone = require("../functionsConfigClone");
+const getProjectId = require("../getProjectId");
+const { requirePermissions } = require("../requirePermissions");
+const utils = require("../utils");
+const logger = require("../logger");
 
 module.exports = new Command("functions:config:clone")
   .description("clone environment config from another project")
@@ -28,7 +28,7 @@ module.exports = new Command("functions:config:clone")
   ])
   .before(functionsConfig.ensureApi)
   .action(function(options) {
-    var projectId = getProjectId(options);
+    const projectId = getProjectId(options);
     if (!options.from) {
       return utils.reject(
         "Must specify a source project in " + clc.bold("--from <projectId>") + " option."
@@ -39,8 +39,8 @@ module.exports = new Command("functions:config:clone")
       return utils.reject("Cannot use both --only and --except at the same time.");
     }
 
-    var only;
-    var except;
+    let only;
+    let except;
     if (options.only) {
       only = options.only.split(",");
     } else if (options.except) {

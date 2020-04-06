@@ -1,31 +1,31 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
-var fs = require("fs");
-var jwt = require("jsonwebtoken");
-var http = require("http");
-var opn = require("open");
-var path = require("path");
-var portfinder = require("portfinder");
-var url = require("url");
+const _ = require("lodash");
+const clc = require("cli-color");
+const fs = require("fs");
+const jwt = require("jsonwebtoken");
+const http = require("http");
+const opn = require("open");
+const path = require("path");
+const portfinder = require("portfinder");
+const url = require("url");
 
-var api = require("./api");
-var { configstore } = require("./configstore");
-var { FirebaseError } = require("./error");
-var logger = require("./logger");
-var { prompt } = require("./prompt");
-var scopes = require("./scopes");
+const api = require("./api");
+const { configstore } = require("./configstore");
+const { FirebaseError } = require("./error");
+const logger = require("./logger");
+const { prompt } = require("./prompt");
+const scopes = require("./scopes");
 
 portfinder.basePort = 9005;
 
-var open = function(url) {
+const open = function(url) {
   opn(url).catch(function(err) {
     logger.debug("Unable to open URL: " + err.stack);
   });
 };
 
-var INVALID_CREDENTIAL_ERROR = new FirebaseError(
+const INVALID_CREDENTIAL_ERROR = new FirebaseError(
   "Authentication Error: Your credentials are no longer valid. Please run " +
     clc.bold("firebase login --reauth") +
     "\n\n" +
@@ -34,8 +34,8 @@ var INVALID_CREDENTIAL_ERROR = new FirebaseError(
   { exit: 1 }
 );
 
-var FIFTEEN_MINUTES_IN_MS = 15 * 60 * 1000;
-var SCOPES = [
+const FIFTEEN_MINUTES_IN_MS = 15 * 60 * 1000;
+const SCOPES = [
   scopes.EMAIL,
   scopes.OPENID,
   scopes.CLOUD_PROJECTS_READONLY,
@@ -43,20 +43,20 @@ var SCOPES = [
   scopes.CLOUD_PLATFORM,
 ];
 
-var _nonce = _.random(1, 2 << 29).toString();
-var _getPort = portfinder.getPortPromise;
+const _nonce = _.random(1, 2 << 29).toString();
+const _getPort = portfinder.getPortPromise;
 
 // in-memory cache, so we have it for successive calls
-var lastAccessToken = {};
+let lastAccessToken = {};
 
-var _getCallbackUrl = function(port) {
+const _getCallbackUrl = function(port) {
   if (_.isUndefined(port)) {
     return "urn:ietf:wg:oauth:2.0:oob";
   }
   return "http://localhost:" + port;
 };
 
-var _getLoginUrl = function(callbackUrl) {
+const _getLoginUrl = function(callbackUrl) {
   return (
     api.authOrigin +
     "/o/oauth2/auth?" +
@@ -75,7 +75,7 @@ var _getLoginUrl = function(callbackUrl) {
   );
 };
 
-var _getTokensFromAuthorizationCode = function(code, callbackUrl) {
+const _getTokensFromAuthorizationCode = function(code, callbackUrl) {
   return api
     .request("POST", "/o/oauth2/token", {
       origin: api.authOrigin,
@@ -108,7 +108,7 @@ var _getTokensFromAuthorizationCode = function(code, callbackUrl) {
     );
 };
 
-var _respondWithFile = function(req, res, statusCode, filename) {
+const _respondWithFile = function(req, res, statusCode, filename) {
   return new Promise(function(resolve, reject) {
     fs.readFile(path.join(__dirname, filename), function(err, response) {
       if (err) {
@@ -125,9 +125,9 @@ var _respondWithFile = function(req, res, statusCode, filename) {
   });
 };
 
-var _loginWithoutLocalhost = function() {
-  var callbackUrl = _getCallbackUrl();
-  var authUrl = _getLoginUrl(callbackUrl);
+const _loginWithoutLocalhost = function() {
+  const callbackUrl = _getCallbackUrl();
+  const authUrl = _getLoginUrl(callbackUrl);
 
   logger.info();
   logger.info("Visit this URL on any device to log in:");
@@ -155,14 +155,14 @@ var _loginWithoutLocalhost = function() {
     });
 };
 
-var _loginWithLocalhost = function(port) {
+const _loginWithLocalhost = function(port) {
   return new Promise(function(resolve, reject) {
-    var callbackUrl = _getCallbackUrl(port);
-    var authUrl = _getLoginUrl(callbackUrl);
+    const callbackUrl = _getCallbackUrl(port);
+    const authUrl = _getLoginUrl(callbackUrl);
 
     var server = http.createServer(function(req, res) {
-      var tokens;
-      var query = _.get(url.parse(req.url, true), "query", {});
+      let tokens;
+      const query = _.get(url.parse(req.url, true), "query", {});
 
       if (query.state === _nonce && _.isString(query.code)) {
         return _getTokensFromAuthorizationCode(query.code, callbackUrl)
@@ -200,16 +200,16 @@ var _loginWithLocalhost = function(port) {
   });
 };
 
-var login = function(localhost) {
+const login = function(localhost) {
   if (localhost) {
     return _getPort().then(_loginWithLocalhost, _loginWithoutLocalhost);
   }
   return _loginWithoutLocalhost();
 };
 
-var _haveValidAccessToken = function(refreshToken, authScopes) {
+const _haveValidAccessToken = function(refreshToken, authScopes) {
   if (_.isEmpty(lastAccessToken)) {
-    var tokens = configstore.get("tokens");
+    const tokens = configstore.get("tokens");
     if (refreshToken === _.get(tokens, "refresh_token")) {
       lastAccessToken = tokens;
     }
@@ -225,9 +225,9 @@ var _haveValidAccessToken = function(refreshToken, authScopes) {
   );
 };
 
-var _logoutCurrentSession = function(refreshToken) {
-  var tokens = configstore.get("tokens");
-  var currentToken = _.get(tokens, "refresh_token");
+const _logoutCurrentSession = function(refreshToken) {
+  const tokens = configstore.get("tokens");
+  const currentToken = _.get(tokens, "refresh_token");
   if (refreshToken === currentToken) {
     configstore.delete("user");
     configstore.delete("tokens");
@@ -236,7 +236,7 @@ var _logoutCurrentSession = function(refreshToken) {
   }
 };
 
-var _refreshAccessToken = function(refreshToken, authScopes) {
+const _refreshAccessToken = function(refreshToken, authScopes) {
   logger.debug("> refreshing access token with scopes:", JSON.stringify(authScopes));
   return api
     .request("POST", "/oauth2/v3/token", {
@@ -268,7 +268,7 @@ var _refreshAccessToken = function(refreshToken, authScopes) {
           res.body
         );
 
-        var currentRefreshToken = _.get(configstore.get("tokens"), "refresh_token");
+        const currentRefreshToken = _.get(configstore.get("tokens"), "refresh_token");
         if (refreshToken === currentRefreshToken) {
           configstore.set("tokens", lastAccessToken);
         }
@@ -292,7 +292,7 @@ var _refreshAccessToken = function(refreshToken, authScopes) {
     );
 };
 
-var getAccessToken = function(refreshToken, authScopes) {
+const getAccessToken = function(refreshToken, authScopes) {
   if (_haveValidAccessToken(refreshToken, authScopes)) {
     return Promise.resolve(lastAccessToken);
   }
@@ -300,7 +300,7 @@ var getAccessToken = function(refreshToken, authScopes) {
   return _refreshAccessToken(refreshToken, authScopes);
 };
 
-var logout = function(refreshToken) {
+const logout = function(refreshToken) {
   if (lastAccessToken.refresh_token === refreshToken) {
     lastAccessToken = {};
   }
@@ -322,7 +322,7 @@ var logout = function(refreshToken) {
   );
 };
 
-var auth = {
+const auth = {
   login: login,
   getAccessToken: getAccessToken,
   logout: logout,

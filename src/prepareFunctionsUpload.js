@@ -1,30 +1,30 @@
 "use strict";
 
-var _ = require("lodash");
-var archiver = require("archiver");
-var clc = require("cli-color");
-var filesize = require("filesize");
-var fs = require("fs");
-var path = require("path");
-var tmp = require("tmp");
+const _ = require("lodash");
+const archiver = require("archiver");
+const clc = require("cli-color");
+const filesize = require("filesize");
+const fs = require("fs");
+const path = require("path");
+const tmp = require("tmp");
 
-var { FirebaseError } = require("./error");
-var functionsConfig = require("./functionsConfig");
-var getProjectId = require("./getProjectId");
-var logger = require("./logger");
-var utils = require("./utils");
-var parseTriggers = require("./parseTriggers");
-var fsAsync = require("./fsAsync");
-var { getRuntimeChoice } = require("./runtimeChoiceSelector");
+const { FirebaseError } = require("./error");
+const functionsConfig = require("./functionsConfig");
+const getProjectId = require("./getProjectId");
+const logger = require("./logger");
+const utils = require("./utils");
+const parseTriggers = require("./parseTriggers");
+const fsAsync = require("./fsAsync");
+const { getRuntimeChoice } = require("./runtimeChoiceSelector");
 
-var CONFIG_DEST_FILE = ".runtimeconfig.json";
+const CONFIG_DEST_FILE = ".runtimeconfig.json";
 
-var _getFunctionsConfig = function(context) {
-  var next = Promise.resolve({});
+const _getFunctionsConfig = function(context) {
+  let next = Promise.resolve({});
   if (context.runtimeConfigEnabled) {
     next = functionsConfig.materializeAll(context.firebaseConfig.projectId).catch(function(err) {
       logger.debug(err);
-      var errorCode = _.get(err, "context.response.statusCode");
+      const errorCode = _.get(err, "context.response.statusCode");
       if (errorCode === 500 || errorCode === 503) {
         throw new FirebaseError(
           "Cloud Runtime Config is currently experiencing issues, " +
@@ -37,13 +37,13 @@ var _getFunctionsConfig = function(context) {
   }
 
   return next.then(function(config) {
-    var firebaseConfig = _.get(context, "firebaseConfig");
+    const firebaseConfig = _.get(context, "firebaseConfig");
     _.set(config, "firebase", firebaseConfig);
     return config;
   });
 };
 
-var _pipeAsync = function(from, to) {
+const _pipeAsync = function(from, to) {
   return new Promise(function(resolve, reject) {
     to.on("finish", resolve);
     to.on("error", reject);
@@ -51,20 +51,20 @@ var _pipeAsync = function(from, to) {
   });
 };
 
-var _packageSource = function(options, sourceDir, configValues) {
-  var tmpFile = tmp.fileSync({ prefix: "firebase-functions-", postfix: ".zip" }).name;
-  var fileStream = fs.createWriteStream(tmpFile, {
+const _packageSource = function(options, sourceDir, configValues) {
+  const tmpFile = tmp.fileSync({ prefix: "firebase-functions-", postfix: ".zip" }).name;
+  const fileStream = fs.createWriteStream(tmpFile, {
     flags: "w",
     defaultEncoding: "binary",
   });
-  var archive = archiver("zip");
-  var archiveDone = _pipeAsync(archive, fileStream);
+  const archive = archiver("zip");
+  const archiveDone = _pipeAsync(archive, fileStream);
 
   // We must ignore firebase-debug.log or weird things happen if
   // you're in the public dir when you deploy.
   // We ignore any CONFIG_DEST_FILE that already exists, and write another one
   // with current config values into the archive in the "end" handler for reader
-  var ignore = options.config.get("functions.ignore", ["node_modules"]);
+  const ignore = options.config.get("functions.ignore", ["node_modules"]);
   ignore.push("firebase-debug.log", CONFIG_DEST_FILE /* .runtimeconfig.json */);
   return fsAsync
     .readdirRecursive({ path: sourceDir, ignore: ignore })
@@ -111,8 +111,8 @@ var _packageSource = function(options, sourceDir, configValues) {
 };
 
 module.exports = function(context, options) {
-  var configValues;
-  var sourceDir = options.config.path(options.config.get("functions.source"));
+  let configValues;
+  const sourceDir = options.config.path(options.config.get("functions.source"));
   context.runtimeChoice = getRuntimeChoice(sourceDir);
   return _getFunctionsConfig(context)
     .then(function(result) {

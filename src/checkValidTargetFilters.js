@@ -1,13 +1,13 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var { FirebaseError } = require("./error");
+const { FirebaseError } = require("./error");
 
 module.exports = function(options) {
   function numFilters(targetTypes) {
     return _.filter(options.only, function(opt) {
-      var optChunks = opt.split(":");
+      const optChunks = opt.split(":");
       return _.includes(targetTypes, optChunks[0]) && optChunks.length > 1;
     }).length;
   }

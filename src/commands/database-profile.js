@@ -1,14 +1,14 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var { Command } = require("../command");
-var requireInstance = require("../requireInstance");
-var { requirePermissions } = require("../requirePermissions");
-var utils = require("../utils");
-var profiler = require("../profiler");
+const { Command } = require("../command");
+const requireInstance = require("../requireInstance");
+const { requirePermissions } = require("../requirePermissions");
+const utils = require("../utils");
+const profiler = require("../profiler");
 
-var description = "profile the Realtime Database and generate a usage report";
+const description = "profile the Realtime Database and generate a usage report";
 
 module.exports = new Command("database:profile")
   .description(description)

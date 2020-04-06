@@ -1,16 +1,16 @@
 "use strict";
 
-var { FirebaseError } = require("./error");
-var fork = require("child_process").fork;
-var path = require("path");
+const { FirebaseError } = require("./error");
+const fork = require("child_process").fork;
+const path = require("path");
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var TRIGGER_PARSER = path.resolve(__dirname, "./triggerParser.js");
+const TRIGGER_PARSER = path.resolve(__dirname, "./triggerParser.js");
 
 module.exports = function(projectId, sourceDir, configValues, firebaseConfig) {
   return new Promise(function(resolve, reject) {
-    var env = _.cloneDeep(process.env);
+    const env = _.cloneDeep(process.env);
     env.GCLOUD_PROJECT = projectId;
     if (!_.isEmpty(configValues)) {
       env.CLOUD_RUNTIME_CONFIG = JSON.stringify(configValues);
@@ -28,7 +28,7 @@ module.exports = function(projectId, sourceDir, configValues, firebaseConfig) {
       // is loaded, which would normally set FIREBASE_CONFIG.
       env.FIREBASE_CONFIG = firebaseConfig;
     }
-    var parser = fork(TRIGGER_PARSER, [sourceDir], { silent: true, env: env });
+    const parser = fork(TRIGGER_PARSER, [sourceDir], { silent: true, env: env });
 
     parser.on("message", function(message) {
       if (message.triggers) {

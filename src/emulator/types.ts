@@ -50,11 +50,11 @@ export const ALL_EMULATORS = [
 ];
 
 export function isDownloadableEmulator(value: string): value is DownloadableEmulators {
-  return isEmulator(value) && DOWNLOADABLE_EMULATORS.indexOf(value) >= 0;
+  return isEmulator(value) && DOWNLOADABLE_EMULATORS.includes(value);
 }
 
 export function isEmulator(value: string): value is Emulators {
-  return Object.values(Emulators).indexOf(value as Emulators) >= 0;
+  return Object.values(Emulators).includes(value as Emulators);
 }
 
 export interface EmulatorInstance {

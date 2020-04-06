@@ -1,33 +1,33 @@
 "use strict";
 
-var chai = require("chai");
-var expect = chai.expect;
+const chai = require("chai");
+const expect = chai.expect;
 
-var path = require("path");
-var RC = require("../rc");
+const path = require("path");
+const RC = require("../rc");
 
-var fixturesDir = path.resolve(__dirname, "./fixtures");
+const fixturesDir = path.resolve(__dirname, "./fixtures");
 
 describe("RC", function() {
   describe(".load", function() {
     it("should load from nearest project directory", function() {
-      var result = RC.load(path.resolve(fixturesDir, "fbrc/conflict"));
+      const result = RC.load(path.resolve(fixturesDir, "fbrc/conflict"));
       expect(result.projects.default).to.eq("top");
     });
 
     it("should be an empty object when not in project dir", function() {
-      var result = RC.load(__dirname);
+      const result = RC.load(__dirname);
       return expect(result.data).to.deep.eq({});
     });
 
     it("should not throw up on invalid json", function() {
-      var result = RC.load(path.resolve(fixturesDir, "fbrc/invalid"));
+      const result = RC.load(path.resolve(fixturesDir, "fbrc/invalid"));
       return expect(result.data).to.deep.eq({});
     });
   });
 
   describe("instance methods", function() {
-    var subject;
+    let subject;
     beforeEach(function() {
       subject = new RC();
     });
@@ -58,7 +58,7 @@ describe("RC", function() {
 
     describe("#targets", function() {
       it("should return all targets for specified project and type", function() {
-        var data = { foo: ["bar"] };
+        const data = { foo: ["bar"] };
         subject.set("targets", { myproject: { storage: data } });
         expect(subject.targets("myproject", "storage")).to.deep.eq(data);
       });
@@ -126,7 +126,7 @@ describe("RC", function() {
 
       it("should return a list of resources that changed targets", function() {
         subject.set("targets", { myproject: { storage: { foo: ["bar"] } } });
-        var result = subject.applyTarget("myproject", "storage", "baz", ["bar", "qux"]);
+        const result = subject.applyTarget("myproject", "storage", "baz", ["bar", "qux"]);
         expect(result).to.deep.eq([{ resource: "bar", target: "foo" }]);
       });
     });

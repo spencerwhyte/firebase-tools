@@ -1,16 +1,16 @@
 "use strict";
 
-var logger = require("../logger");
-var api = require("../api");
-var clc = require("cli-color");
-var _ = require("lodash");
-var getProjectId = require("../getProjectId");
-var utils = require("../utils");
-var { FirebaseError } = require("../error");
-var track = require("../track");
-var lifecycleHooks = require("./lifecycleHooks");
+const logger = require("../logger");
+const api = require("../api");
+const clc = require("cli-color");
+const _ = require("lodash");
+const getProjectId = require("../getProjectId");
+const utils = require("../utils");
+const { FirebaseError } = require("../error");
+const track = require("../track");
+const lifecycleHooks = require("./lifecycleHooks");
 
-var TARGETS = {
+const TARGETS = {
   hosting: require("./hosting"),
   database: require("./database"),
   firestore: require("./firestore"),
@@ -18,12 +18,12 @@ var TARGETS = {
   storage: require("./storage"),
 };
 
-var _noop = function() {
+const _noop = function() {
   return Promise.resolve();
 };
 
 var _chain = function(fns, context, options, payload) {
-  var latest = (fns.shift() || _noop)(context, options, payload);
+  const latest = (fns.shift() || _noop)(context, options, payload);
   if (fns.length) {
     return latest.then(function() {
       return _chain(fns, context, options, payload);
@@ -38,20 +38,20 @@ var _chain = function(fns, context, options, payload) {
  * number of deploy targets. This allows deploys to be done all together or
  * for individual deployable elements to be deployed as such.
  */
-var deploy = function(targetNames, options) {
-  var projectId = getProjectId(options);
-  var payload = {};
+const deploy = function(targetNames, options) {
+  const projectId = getProjectId(options);
+  const payload = {};
   // a shared context object for deploy targets to decorate as needed
-  var context = { projectId: projectId };
-  var predeploys = [];
-  var prepares = [];
-  var deploys = [];
-  var releases = [];
-  var postdeploys = [];
+  const context = { projectId: projectId };
+  const predeploys = [];
+  const prepares = [];
+  const deploys = [];
+  const releases = [];
+  const postdeploys = [];
 
-  for (var i = 0; i < targetNames.length; i++) {
-    var targetName = targetNames[i];
-    var target = TARGETS[targetName];
+  for (let i = 0; i < targetNames.length; i++) {
+    const targetName = targetNames[i];
+    const target = TARGETS[targetName];
 
     if (!target) {
       return Promise.reject(
@@ -99,7 +99,7 @@ var deploy = function(targetNames, options) {
       logger.info();
       utils.logSuccess(clc.underline.bold("Deploy complete!"));
       logger.info();
-      var deployedHosting = _.includes(targetNames, "hosting");
+      const deployedHosting = _.includes(targetNames, "hosting");
       logger.info(clc.bold("Project Console:"), utils.consoleUrl(options.project, "/overview"));
       if (deployedHosting) {
         _.each(context.hosting.deploys, function(deploy) {

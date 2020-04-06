@@ -1,10 +1,10 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
-var marked = require("marked");
+const _ = require("lodash");
+const clc = require("cli-color");
+const marked = require("marked");
 
-var { FirebaseError } = require("./error");
+const { FirebaseError } = require("./error");
 
 /**
  * Tries to determine the correct app name for commands that
@@ -17,8 +17,8 @@ var { FirebaseError } = require("./error");
  */
 module.exports = function(options, allowNull = false) {
   if (!options.project && !allowNull) {
-    var aliases = _.get(options, "rc.projects", {});
-    var aliasCount = _.size(aliases);
+    const aliases = _.get(options, "rc.projects", {});
+    const aliasCount = _.size(aliases);
 
     if (aliasCount === 0) {
       throw new FirebaseError(
@@ -41,7 +41,7 @@ module.exports = function(options, allowNull = false) {
         }
       );
     } else {
-      var aliasList = _.map(aliases, function(projectId, aname) {
+      const aliasList = _.map(aliases, function(projectId, aname) {
         return "  " + aname + " (" + projectId + ")";
       }).join("\n");
 

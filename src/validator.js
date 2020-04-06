@@ -1,20 +1,20 @@
 "use strict";
 
-var JSONSchema = require("jsonschema");
-var jsonschema = new JSONSchema.Validator();
-var request = require("request");
+const JSONSchema = require("jsonschema");
+const jsonschema = new JSONSchema.Validator();
+const request = require("request");
 
-var { FirebaseError } = require("./error");
+const { FirebaseError } = require("./error");
 
-var NAMED_SCHEMAS = {
+const NAMED_SCHEMAS = {
   firebase:
     "https://gist.githubusercontent.com/mbleigh/6040df46f12f349889b2/raw/1c11a6e00a7295c84508dca80f2c92b00ba44006/firebase-schema.json",
 };
 
-var Validator = function(url) {
+const Validator = function(url) {
   this._validateQueue = [];
 
-  var self = this;
+  const self = this;
   request.get(url, function(err, response, body) {
     if (!err && response.statusCode === 200) {
       self.schema = JSON.parse(body);
@@ -24,7 +24,7 @@ var Validator = function(url) {
 };
 
 Validator.prototype.validate = function(data) {
-  var self = this;
+  const self = this;
   return new Promise(function(resolve, reject) {
     self._validateQueue.push({
       data: data,
@@ -40,10 +40,10 @@ Validator.prototype._process = function() {
     return;
   }
   while (this._validateQueue.length) {
-    var item = this._validateQueue.shift();
-    var result = jsonschema.validate(item.data, this.schema);
+    const item = this._validateQueue.shift();
+    const result = jsonschema.validate(item.data, this.schema);
 
-    var err = new FirebaseError("Your document has validation errors", {
+    const err = new FirebaseError("Your document has validation errors", {
       children: this._decorateErrors(result.errors),
       exit: 2,
     });
@@ -63,7 +63,7 @@ Validator.prototype._decorateErrors = function(errors) {
   return errors;
 };
 
-for (var name in NAMED_SCHEMAS) {
+for (const name in NAMED_SCHEMAS) {
   if ({}.hasOwnProperty.call(NAMED_SCHEMAS, name)) {
     Validator[name] = new Validator(NAMED_SCHEMAS[name]);
   }

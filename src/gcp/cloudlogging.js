@@ -1,10 +1,10 @@
 "use strict";
 
-var api = require("../api");
+const api = require("../api");
 
-var version = "v2beta1";
+const version = "v2beta1";
 
-var _listEntries = function(projectId, filter, pageSize, order) {
+const _listEntries = function(projectId, filter, pageSize, order) {
   return api
     .request("POST", "/" + version + "/entries:list", {
       auth: true,

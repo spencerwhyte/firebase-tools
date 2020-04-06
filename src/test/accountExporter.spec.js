@@ -1,17 +1,17 @@
 "use strict";
 
-var chai = require("chai");
-var nock = require("nock");
-var os = require("os");
-var sinon = require("sinon");
+const chai = require("chai");
+const nock = require("nock");
+const os = require("os");
+const sinon = require("sinon");
 
-var accountExporter = require("../accountExporter");
-var helpers = require("./helpers");
+const accountExporter = require("../accountExporter");
+const helpers = require("./helpers");
 
-var expect = chai.expect;
+const expect = chai.expect;
 describe("accountExporter", function() {
-  var validateOptions = accountExporter.validateOptions;
-  var serialExportUsers = accountExporter.serialExportUsers;
+  const validateOptions = accountExporter.validateOptions;
+  const serialExportUsers = accountExporter.serialExportUsers;
 
   describe("validateOptions", function() {
     it("should reject when no format provided", function() {
@@ -23,30 +23,30 @@ describe("accountExporter", function() {
     });
 
     it("should ignore format param when implicitly specified in file name", function() {
-      var ret = validateOptions({ format: "JSON" }, "output_file.csv");
+      const ret = validateOptions({ format: "JSON" }, "output_file.csv");
       expect(ret.format).to.eq("csv");
     });
 
     it("should use format param when not implicitly specified in file name", function() {
-      var ret = validateOptions({ format: "JSON" }, "output_file");
+      const ret = validateOptions({ format: "JSON" }, "output_file");
       expect(ret.format).to.eq("json");
     });
   });
 
   describe("serialExportUsers", function() {
-    var sandbox;
-    var userList = [];
-    var writeStream = {
+    let sandbox;
+    let userList = [];
+    const writeStream = {
       write: function() {},
       end: function() {},
     };
-    var spyWrite;
+    let spyWrite;
 
     beforeEach(function() {
       sandbox = sinon.createSandbox();
       helpers.mockAuth(sandbox);
       spyWrite = sandbox.spy(writeStream, "write");
-      for (var i = 0; i < 7; i++) {
+      for (let i = 0; i < 7; i++) {
         userList.push({
           localId: i.toString(),
           email: "test" + i + "@test.org",
@@ -107,7 +107,7 @@ describe("accountExporter", function() {
       }).then(function() {
         expect(spyWrite.callCount).to.eq(7);
         expect(spyWrite.getCall(0).args[0]).to.eq(JSON.stringify(userList[0], null, 2));
-        for (var j = 1; j < 7; j++) {
+        for (let j = 1; j < 7; j++) {
           expect(spyWrite.getCall(j).args[0]).to.eq(
             "," + os.EOL + JSON.stringify(userList[j], null, 2)
           );
@@ -124,8 +124,8 @@ describe("accountExporter", function() {
         writeStream: writeStream,
       }).then(function() {
         expect(spyWrite.callCount).to.eq(userList.length);
-        for (var j = 0; j < userList.length; j++) {
-          var expectedEntry =
+        for (let j = 0; j < userList.length; j++) {
+          const expectedEntry =
             userList[j].localId +
             "," +
             userList[j].email +
@@ -140,7 +140,7 @@ describe("accountExporter", function() {
 
     it("should encapsulate displayNames with commas for csv formats", function() {
       // Initialize user with comma in display name.
-      var singleUser = {
+      const singleUser = {
         localId: "1",
         email: "test1@test.org",
         displayName: "John Tester1, CFA",
@@ -171,7 +171,7 @@ describe("accountExporter", function() {
         writeStream: writeStream,
       }).then(function() {
         expect(spyWrite.callCount).to.eq(1);
-        var expectedEntry =
+        const expectedEntry =
           singleUser.localId +
           "," +
           singleUser.email +

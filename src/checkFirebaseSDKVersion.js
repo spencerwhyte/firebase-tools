@@ -1,14 +1,14 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
-var path = require("path");
+const _ = require("lodash");
+const clc = require("cli-color");
+const path = require("path");
 
-var semver = require("semver");
-var spawn = require("cross-spawn");
+const semver = require("semver");
+const spawn = require("cross-spawn");
 
-var utils = require("./utils");
-var logger = require("./logger");
+const utils = require("./utils");
+const logger = require("./logger");
 
 module.exports = function(options) {
   return new Promise(function(resolve) {
@@ -16,8 +16,8 @@ module.exports = function(options) {
       return resolve();
     }
     try {
-      var output;
-      var child = spawn("npm", ["outdated", "firebase-functions", "--json=true"], {
+      let output;
+      const child = spawn("npm", ["outdated", "firebase-functions", "--json=true"], {
         cwd: path.join(options.config.projectDir, options.config.get("functions.source")),
         stdio: [0, "pipe", 2],
       });
@@ -41,8 +41,8 @@ module.exports = function(options) {
     if (!output || _.isEmpty(output)) {
       return;
     }
-    var wanted = output["firebase-functions"].wanted;
-    var latest = output["firebase-functions"].latest;
+    const wanted = output["firebase-functions"].wanted;
+    const latest = output["firebase-functions"].latest;
 
     try {
       if (semver.lt(wanted, latest)) {

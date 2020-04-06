@@ -1,8 +1,8 @@
 "use strict";
 
-var _ = require("lodash");
-var { getFirebaseProject } = require("./management/projects");
-var logger = require("./logger");
+const _ = require("lodash");
+const { getFirebaseProject } = require("./management/projects");
+const logger = require("./logger");
 
 /**
  * Tries to determine the instance ID for the provided

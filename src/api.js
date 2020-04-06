@@ -1,26 +1,26 @@
 "use strict";
 
-var _ = require("lodash");
-var querystring = require("querystring");
-var request = require("request");
-var url = require("url");
+const _ = require("lodash");
+const querystring = require("querystring");
+const request = require("request");
+const url = require("url");
 
-var { FirebaseError } = require("./error");
-var logger = require("./logger");
-var responseToError = require("./responseToError");
-var scopes = require("./scopes");
-var utils = require("./utils");
+const { FirebaseError } = require("./error");
+const logger = require("./logger");
+const responseToError = require("./responseToError");
+const scopes = require("./scopes");
+const utils = require("./utils");
 
-var CLI_VERSION = require("../package.json").version;
+const CLI_VERSION = require("../package.json").version;
 
-var accessToken;
-var refreshToken;
-var commandScopes;
+let accessToken;
+let refreshToken;
+let commandScopes;
 
-var _request = function(options, logOptions) {
+const _request = function(options, logOptions) {
   logOptions = logOptions || {};
-  var qsLog = "";
-  var bodyLog = "<request body omitted>";
+  let qsLog = "";
+  let bodyLog = "<request body omitted>";
 
   if (options.qs && !logOptions.skipQueryParams) {
     qsLog = JSON.stringify(options.qs);
@@ -36,7 +36,7 @@ var _request = function(options, logOptions) {
   options.headers["connection"] = "keep-alive";
 
   return new Promise(function(resolve, reject) {
-    var req = request(options, function(err, response, body) {
+    const req = request(options, function(err, response, body) {
       if (err) {
         return reject(
           new FirebaseError("Server Error. " + err.message, {
@@ -63,7 +63,7 @@ var _request = function(options, logOptions) {
     });
 
     if (_.size(options.files) > 0) {
-      var form = req.form();
+      const form = req.form();
       _.forEach(options.files, function(details, param) {
         form.append(param, details.stream, {
           knownLength: details.knownLength,
@@ -75,7 +75,7 @@ var _request = function(options, logOptions) {
   });
 };
 
-var _appendQueryData = function(path, data) {
+const _appendQueryData = function(path, data) {
   if (data && _.size(data) > 0) {
     path += _.includes(path, "?") ? "&" : "?";
     path += querystring.stringify(data);
@@ -217,13 +217,13 @@ var api = {
       options
     );
 
-    var validMethods = ["GET", "PUT", "POST", "DELETE", "PATCH"];
+    const validMethods = ["GET", "PUT", "POST", "DELETE", "PATCH"];
 
     if (validMethods.indexOf(method) < 0) {
       method = "GET";
     }
 
-    var reqOptions = {
+    const reqOptions = {
       method: method,
     };
 
@@ -249,11 +249,11 @@ var api = {
     reqOptions.headers = options.headers;
     reqOptions.timeout = options.timeout;
 
-    var requestFunction = function() {
+    let requestFunction = function() {
       return _request(reqOptions, options.logOptions);
     };
 
-    var secureRequest = true;
+    let secureRequest = true;
     if (options.origin) {
       // Only 'https' requests are secure. Protocol includes the final ':'
       // https://developer.mozilla.org/en-US/docs/Web/API/URL/protocol

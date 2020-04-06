@@ -1,24 +1,24 @@
 "use strict";
 
-var clc = require("cli-color");
-var fs = require("fs");
-var homeDir = require("os").homedir();
-var path = require("path");
+const clc = require("cli-color");
+const fs = require("fs");
+const homeDir = require("os").homedir();
+const path = require("path");
 
-var { Command } = require("../command");
-var Config = require("../config");
-var fsutils = require("../fsutils");
-var init = require("../init");
-var logger = require("../logger");
-var { prompt, promptOnce } = require("../prompt");
-var { requireAuth } = require("../requireAuth");
-var utils = require("../utils");
+const { Command } = require("../command");
+const Config = require("../config");
+const fsutils = require("../fsutils");
+const init = require("../init");
+const logger = require("../logger");
+const { prompt, promptOnce } = require("../prompt");
+const { requireAuth } = require("../requireAuth");
+const utils = require("../utils");
 
-var TEMPLATE_ROOT = path.resolve(__dirname, "../../templates/");
-var BANNER_TEXT = fs.readFileSync(path.join(TEMPLATE_ROOT, "banner.txt"), "utf8");
-var GITIGNORE_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "_gitignore"), "utf8");
+const TEMPLATE_ROOT = path.resolve(__dirname, "../../templates/");
+const BANNER_TEXT = fs.readFileSync(path.join(TEMPLATE_ROOT, "banner.txt"), "utf8");
+const GITIGNORE_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "_gitignore"), "utf8");
 
-var _isOutside = function(from, to) {
+const _isOutside = function(from, to) {
   return path.relative(from, to).match(/^\.\./);
 };
 
@@ -26,10 +26,10 @@ module.exports = new Command("init [feature]")
   .description("setup a Firebase project in the current directory")
   .before(requireAuth)
   .action(function(feature, options) {
-    var cwd = options.cwd || process.cwd();
+    const cwd = options.cwd || process.cwd();
 
-    var warnings = [];
-    var warningText = "";
+    const warnings = [];
+    let warningText = "";
     if (_isOutside(homeDir, cwd)) {
       warnings.push("You are currently outside your home directory");
     }
@@ -37,8 +37,8 @@ module.exports = new Command("init [feature]")
       warnings.push("You are initializing your home directory as a Firebase project");
     }
 
-    var config = Config.load(options, true);
-    var existingConfig = !!config;
+    let config = Config.load(options, true);
+    const existingConfig = !!config;
     if (!existingConfig) {
       config = new Config({}, { projectDir: cwd, cwd: cwd });
     } else {
@@ -61,7 +61,7 @@ module.exports = new Command("init [feature]")
         warningText
     );
 
-    var setup = {
+    const setup = {
       config: config._src,
       rcfile: config.readProjectFile(".firebaserc", {
         json: true,
@@ -69,7 +69,7 @@ module.exports = new Command("init [feature]")
       }),
     };
 
-    var choices = [
+    const choices = [
       {
         value: "database",
         name: "Database: Deploy Firebase Realtime Database Rules",
@@ -102,7 +102,7 @@ module.exports = new Command("init [feature]")
       },
     ];
 
-    var next;
+    let next;
     // HACK: Windows Node has issues with selectables as the first prompt, so we
     // add an extra confirmation prompt that fixes the problem
     if (process.platform === "win32") {

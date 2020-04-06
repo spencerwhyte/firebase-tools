@@ -1,23 +1,23 @@
 "use strict";
 
-var clc = require("cli-color");
-var _ = require("lodash");
+const clc = require("cli-color");
+const _ = require("lodash");
 
-var { Command } = require("../command");
-var logger = require("../logger");
-var utils = require("../utils");
-var { requirePermissions } = require("../requirePermissions");
-var requireConfig = require("../requireConfig");
-var { serve } = require("../serve/index");
-var filterTargets = require("../filterTargets");
-var getProjectNumber = require("../getProjectNumber");
-var { FirebaseError } = require("../error");
+const { Command } = require("../command");
+const logger = require("../logger");
+const utils = require("../utils");
+const { requirePermissions } = require("../requirePermissions");
+const requireConfig = require("../requireConfig");
+const { serve } = require("../serve/index");
+const filterTargets = require("../filterTargets");
+const getProjectNumber = require("../getProjectNumber");
+const { FirebaseError } = require("../error");
 
-var VALID_TARGETS = ["hosting", "functions"];
-var REQUIRES_AUTH = ["hosting", "functions"];
-var ALL_TARGETS = _.union(VALID_TARGETS, ["database", "firestore"]);
+const VALID_TARGETS = ["hosting", "functions"];
+const REQUIRES_AUTH = ["hosting", "functions"];
+const ALL_TARGETS = _.union(VALID_TARGETS, ["database", "firestore"]);
 
-var filterOnly = (list, only) => {
+const filterOnly = (list, only) => {
   if (!only) {
     return [];
   }

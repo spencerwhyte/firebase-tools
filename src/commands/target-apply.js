@@ -1,12 +1,12 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
+const _ = require("lodash");
+const clc = require("cli-color");
 
-var { Command } = require("../command");
-var logger = require("../logger");
-var requireConfig = require("../requireConfig");
-var utils = require("../utils");
+const { Command } = require("../command");
+const logger = require("../logger");
+const requireConfig = require("../requireConfig");
+const utils = require("../utils");
 
 module.exports = new Command("target:apply <type> <name> <resources...>")
   .description("apply a deploy target to a resource")
@@ -18,7 +18,7 @@ module.exports = new Command("target:apply <type> <name> <resources...>")
       );
     }
 
-    var changes = options.rc.applyTarget(options.project, type, name, resources);
+    const changes = options.rc.applyTarget(options.project, type, name, resources);
 
     utils.logSuccess(
       "Applied " + type + " target " + clc.bold(name) + " to " + clc.bold(resources.join(", "))

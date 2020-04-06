@@ -1,9 +1,9 @@
 "use strict";
 
-var chai = require("chai");
-var expect = chai.expect;
+const chai = require("chai");
+const expect = chai.expect;
 
-var functionsConfig = require("../functionsConfig");
+const functionsConfig = require("../functionsConfig");
 
 describe("config.parseSetArgs", function() {
   it("should throw if a reserved namespace is used", function() {

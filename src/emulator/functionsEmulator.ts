@@ -109,7 +109,7 @@ export class FunctionsEmulator implements EmulatorInstance {
     return `http://${host}:${port}/${projectId}/${region}/${name}`;
   }
 
-  nodeBinary: string = "";
+  nodeBinary = "";
   private server?: http.Server;
   private triggers: EmulatedTriggerDefinition[] = [];
   private knownTriggerIDs: { [triggerId: string]: boolean } = {};
@@ -265,7 +265,7 @@ export class FunctionsEmulator implements EmulatorInstance {
         "SYSTEM",
         "triggers-parsed"
       );
-      let triggerDefinitions = triggerParseEvent.data
+      const triggerDefinitions = triggerParseEvent.data
         .triggerDefinitions as EmulatedTriggerDefinition[];
 
       const toSetup = triggerDefinitions.filter(

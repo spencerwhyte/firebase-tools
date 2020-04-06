@@ -1,20 +1,20 @@
 "use strict";
 
 const Uploader = require("./uploader");
-var { listFiles } = require("../../listFiles");
-var logger = require("../../logger");
-var track = require("../../track");
-var utils = require("../../utils");
+const { listFiles } = require("../../listFiles");
+const logger = require("../../logger");
+const track = require("../../track");
+const utils = require("../../utils");
 
-var clc = require("cli-color");
-var SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+const clc = require("cli-color");
+const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 module.exports = function(context, options) {
   if (!context.hosting || !context.hosting.deploys) {
     return Promise.resolve();
   }
 
-  var spins = 0;
+  let spins = 0;
   function _updateSpinner(newMessage) {
     // don't try to rewrite lines if debugging since it's likely to get interrupted
     if (debugging) {
@@ -32,7 +32,7 @@ module.exports = function(context, options) {
     const deploy = deploys.shift();
 
     utils.logLabeledBullet("hosting[" + deploy.site + "]", "beginning deploy...");
-    var t0 = Date.now();
+    const t0 = Date.now();
 
     const publicDir = options.config.path(deploy.config.public);
     const files = listFiles(publicDir, deploy.config.ignore);
@@ -48,7 +48,7 @@ module.exports = function(context, options) {
       cwd: options.cwd,
     });
 
-    var progressInterval = setInterval(
+    const progressInterval = setInterval(
       function() {
         _updateSpinner(uploader.statusMessage());
       },
@@ -63,7 +63,7 @@ module.exports = function(context, options) {
           process.stdout.write(clc.erase.line + clc.move.left(9999));
         }
         utils.logLabeledSuccess("hosting[" + deploy.site + "]", "file upload complete");
-        var dt = Date.now() - t0;
+        const dt = Date.now() - t0;
         logger.debug("[hosting] deploy completed after " + dt + "ms");
         return track("Hosting Deploy", "success", dt);
       })

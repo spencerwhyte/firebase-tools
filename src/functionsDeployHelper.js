@@ -1,14 +1,14 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
+const _ = require("lodash");
+const clc = require("cli-color");
 
-var { FirebaseError } = require("./error");
-var logger = require("./logger");
-var track = require("./track");
-var utils = require("./utils");
-var cloudfunctions = require("./gcp/cloudfunctions");
-var pollOperations = require("./pollOperations");
+const { FirebaseError } = require("./error");
+const logger = require("./logger");
+const track = require("./track");
+const utils = require("./utils");
+const cloudfunctions = require("./gcp/cloudfunctions");
+const pollOperations = require("./pollOperations");
 
 function functionMatchesGroup(functionName, groupChunks) {
   return _.isEqual(
@@ -24,7 +24,7 @@ function getFilterGroups(options) {
     return [];
   }
 
-  var opts;
+  let opts;
   return _.chain(options.only.split(","))
     .filter(function(filter) {
       opts = filter.split(":");
@@ -41,7 +41,7 @@ function getReleaseNames(uploadNames, existingNames, functionFilterGroups) {
     return uploadNames;
   }
 
-  var allFunctions = _.union(uploadNames, existingNames);
+  const allFunctions = _.union(uploadNames, existingNames);
   return _.filter(allFunctions, function(functionName) {
     return _.some(
       _.map(functionFilterGroups, function(groupChunks) {
@@ -73,8 +73,8 @@ function logFilters(existingNames, releaseNames, functionFilterGroups) {
     utils.logBullet(clc.bold.cyan("functions: ") + "uploading functions in project: " + list);
   }
 
-  var allFunctions = _.union(releaseNames, existingNames);
-  var unmatchedFilters = _.chain(functionFilterGroups)
+  const allFunctions = _.union(releaseNames, existingNames);
+  const unmatchedFilters = _.chain(functionFilterGroups)
     .filter(function(filterGroup) {
       return !_.some(
         _.map(allFunctions, function(functionName) {
@@ -96,7 +96,7 @@ function logFilters(existingNames, releaseNames, functionFilterGroups) {
 }
 
 function getFunctionsInfo(parsedTriggers, projectId) {
-  var functionsInfo = [];
+  const functionsInfo = [];
   _.forEach(parsedTriggers, function(trigger) {
     if (!trigger.regions) {
       trigger.regions = ["us-central1"];
@@ -104,7 +104,7 @@ function getFunctionsInfo(parsedTriggers, projectId) {
     // SDK exports list of regions for each function to be deployed to, need to add a new entry
     // to functionsInfo for each region.
     _.forEach(trigger.regions, function(region) {
-      var triggerDeepCopy = JSON.parse(JSON.stringify(trigger));
+      const triggerDeepCopy = JSON.parse(JSON.stringify(trigger));
       functionsInfo.push(
         _.chain(triggerDeepCopy)
           .omit("regions")
@@ -122,7 +122,7 @@ function getFunctionTrigger(functionInfo) {
   if (functionInfo.httpsTrigger) {
     return _.pick(functionInfo, "httpsTrigger");
   } else if (functionInfo.eventTrigger) {
-    var trigger = functionInfo.eventTrigger;
+    const trigger = functionInfo.eventTrigger;
     return { eventTrigger: trigger };
   }
   logger.debug("Unknown trigger type found in:", functionInfo);
@@ -142,7 +142,7 @@ function getFunctionName(fullName) {
  ** and schedules created under the old pattern will no longer be cleaned up correctly
  */
 function getScheduleName(fullName, appEngineLocation) {
-  var [projectsPrefix, project, regionsPrefix, region, , functionName] = fullName.split("/");
+  const [projectsPrefix, project, regionsPrefix, region, , functionName] = fullName.split("/");
   return `${projectsPrefix}/${project}/${regionsPrefix}/${appEngineLocation}/jobs/firebase-schedule-${functionName}-${region}`;
 }
 
@@ -153,7 +153,7 @@ function getScheduleName(fullName, appEngineLocation) {
  ** If you change this pattern, topics created under the old pattern will no longer be cleaned up correctly
  */
 function getTopicName(fullName) {
-  var [projectsPrefix, project, , region, , functionName] = fullName.split("/");
+  const [projectsPrefix, project, , region, , functionName] = fullName.split("/");
   return `${projectsPrefix}/${project}/topics/firebase-schedule-${functionName}-${region}`;
 }
 
@@ -166,7 +166,7 @@ function getFunctionLabel(fullName) {
 }
 
 function pollDeploys(operations, printSuccess, printFail, printTooManyOps, projectId) {
-  var interval;
+  let interval;
   // Poll less frequently when there are many operations to avoid hitting read quota.
   // See "Read requests" quota at https://cloud.google.com/console/apis/api/cloudfunctions/quotas
   if (_.size(operations) > 90) {
@@ -179,12 +179,12 @@ function pollDeploys(operations, printSuccess, printFail, printTooManyOps, proje
   } else {
     interval = 2 * 1000;
   }
-  var pollFunction = cloudfunctions.check;
+  const pollFunction = cloudfunctions.check;
 
-  var retryCondition = function(result) {
+  const retryCondition = function(result) {
     // The error codes from a Google.LongRunning operation follow google.rpc.Code format.
 
-    var retryableCodes = [
+    const retryableCodes = [
       1, // cancelled by client
       4, // deadline exceeded
       10, // aborted (typically due to concurrency issue)

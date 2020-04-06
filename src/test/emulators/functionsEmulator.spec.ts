@@ -7,7 +7,7 @@ import { EmulatedTriggerType } from "../../emulator/functionsEmulatorShared";
 import * as express from "express";
 import { RuntimeWorker } from "../../emulator/functionsRuntimeWorker";
 
-if ((process.env.DEBUG || "").toLowerCase().indexOf("spec") >= 0) {
+if ((process.env.DEBUG || "").toLowerCase().includes("spec")) {
   // tslint:disable-next-line:no-var-requires
   logger.add(require("winston").transports.Console, {
     level: "debug",

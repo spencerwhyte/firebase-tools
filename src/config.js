@@ -1,19 +1,19 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
-var cjson = require("cjson");
-var fs = require("fs-extra");
-var path = require("path");
+const _ = require("lodash");
+const clc = require("cli-color");
+const cjson = require("cjson");
+const fs = require("fs-extra");
+const path = require("path");
 
-var detectProjectRoot = require("./detectProjectRoot").detectProjectRoot;
-var { FirebaseError } = require("./error");
-var fsutils = require("./fsutils");
-var loadCJSON = require("./loadCJSON");
-var parseBoltRules = require("./parseBoltRules");
-var { promptOnce } = require("./prompt");
-var { resolveProjectPath } = require("./projectPath");
-var utils = require("./utils");
+const detectProjectRoot = require("./detectProjectRoot").detectProjectRoot;
+const { FirebaseError } = require("./error");
+const fsutils = require("./fsutils");
+const loadCJSON = require("./loadCJSON");
+const parseBoltRules = require("./parseBoltRules");
+const { promptOnce } = require("./prompt");
+const { resolveProjectPath } = require("./projectPath");
+const utils = require("./utils");
 
 var Config = function(src, options) {
   this.options = options || {};
@@ -69,7 +69,7 @@ Config.prototype._hasDeepKey = function(obj, key) {
     return true;
   }
 
-  for (var k in obj) {
+  for (const k in obj) {
     if (_.isPlainObject(obj[k]) && this._hasDeepKey(obj[k], key)) {
       return true;
     }
@@ -78,11 +78,11 @@ Config.prototype._hasDeepKey = function(obj, key) {
 };
 
 Config.prototype._materialize = function(target) {
-  var val = _.get(this._src, target);
+  const val = _.get(this._src, target);
   if (_.isString(val)) {
-    var out = this._parseFile(target, val);
+    let out = this._parseFile(target, val);
     // if e.g. rules.json has {"rules": {}} use that
-    var lastSegment = _.last(target.split("."));
+    const lastSegment = _.last(target.split("."));
     if (_.size(out) === 1 && _.has(out, lastSegment)) {
       out = out[lastSegment];
     }
@@ -97,8 +97,8 @@ Config.prototype._materialize = function(target) {
 };
 
 Config.prototype._parseFile = function(target, filePath) {
-  var fullPath = resolveProjectPath(this.options.cwd, filePath);
-  var ext = path.extname(filePath);
+  const fullPath = resolveProjectPath(this.options.cwd, filePath);
+  const ext = path.extname(filePath);
   if (!fsutils.fileExistsSync(fullPath)) {
     throw new FirebaseError("Parse Error: Imported file " + filePath + " does not exist", {
       exit: 1,
@@ -148,7 +148,7 @@ Config.prototype.has = function(key) {
 };
 
 Config.prototype.path = function(pathName) {
-  var outPath = path.normalize(path.join(this.projectDir, pathName));
+  const outPath = path.normalize(path.join(this.projectDir, pathName));
   if (_.includes(path.relative(this.projectDir, outPath), "..")) {
     throw new FirebaseError(clc.bold(pathName) + " is outside of project directory", { exit: 1 });
   }
@@ -158,7 +158,7 @@ Config.prototype.path = function(pathName) {
 Config.prototype.readProjectFile = function(p, options) {
   options = options || {};
   try {
-    var content = fs.readFileSync(this.path(p), "utf8");
+    const content = fs.readFileSync(this.path(p), "utf8");
     if (options.json) {
       return JSON.parse(content);
     }
@@ -184,8 +184,8 @@ Config.prototype.writeProjectFile = function(p, content) {
 };
 
 Config.prototype.askWriteProjectFile = function(p, content) {
-  var writeTo = this.path(p);
-  var next;
+  const writeTo = this.path(p);
+  let next;
   if (fsutils.fileExistsSync(writeTo)) {
     next = promptOnce({
       type: "confirm",
@@ -196,7 +196,7 @@ Config.prototype.askWriteProjectFile = function(p, content) {
     next = Promise.resolve(true);
   }
 
-  var self = this;
+  const self = this;
   return next.then(function(result) {
     if (result) {
       self.writeProjectFile(p, content);
@@ -208,10 +208,10 @@ Config.prototype.askWriteProjectFile = function(p, content) {
 };
 
 Config.load = function(options, allowMissing) {
-  var pd = detectProjectRoot(options.cwd);
+  const pd = detectProjectRoot(options.cwd);
   if (pd) {
     try {
-      var data = cjson.load(path.join(pd, Config.FILENAME));
+      const data = cjson.load(path.join(pd, Config.FILENAME));
       return new Config(data, options);
     } catch (e) {
       throw new FirebaseError("There was an error loading firebase.json:\n\n" + e.message, {

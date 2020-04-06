@@ -75,6 +75,6 @@ export class HubExport {
   }
 
   private shouldExport(e: Emulators): boolean {
-    return IMPORT_EXPORT_EMULATORS.indexOf(e) >= 0 && EmulatorRegistry.isRunning(e);
+    return IMPORT_EXPORT_EMULATORS.includes(e) && EmulatorRegistry.isRunning(e);
   }
 }

@@ -1,15 +1,15 @@
 "use strict";
 
-var { Command } = require("../command");
-var requireInstance = require("../requireInstance");
-var { requirePermissions } = require("../requirePermissions");
-var DatabaseRemove = require("../database/remove").default;
-var api = require("../api");
+const { Command } = require("../command");
+const requireInstance = require("../requireInstance");
+const { requirePermissions } = require("../requirePermissions");
+const DatabaseRemove = require("../database/remove").default;
+const api = require("../api");
 
-var utils = require("../utils");
-var { prompt } = require("../prompt");
-var clc = require("cli-color");
-var _ = require("lodash");
+const utils = require("../utils");
+const { prompt } = require("../prompt");
+const clc = require("cli-color");
+const _ = require("lodash");
 
 module.exports = new Command("database:remove <path>")
   .description("remove data from your Firebase at the specified path")
@@ -39,7 +39,7 @@ module.exports = new Command("database:remove <path>")
       if (!options.confirm) {
         return utils.reject("Command aborted.", { exit: 1 });
       }
-      var removeOps = new DatabaseRemove(options.instance, path);
+      const removeOps = new DatabaseRemove(options.instance, path);
       return removeOps.execute().then(function() {
         utils.logSuccess("Data removed successfully");
       });

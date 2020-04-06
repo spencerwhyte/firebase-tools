@@ -4,24 +4,24 @@
  * If you make any changes to this file, run the integration test in scripts/test-functions-deploy.js
  */
 
-var clc = require("cli-color");
-var _ = require("lodash");
+const clc = require("cli-color");
+const _ = require("lodash");
 
-var { FirebaseError } = require("../../error");
-var gcp = require("../../gcp");
-var logger = require("../../logger");
-var track = require("../../track");
-var utils = require("../../utils");
-var helper = require("../../functionsDeployHelper");
-var runtimeSelector = require("../../runtimeChoiceSelector");
-var { getAppEngineLocation } = require("../../functionsConfig");
-var { promptOnce } = require("../../prompt");
-var { createOrUpdateSchedulesAndTopics } = require("./createOrUpdateSchedulesAndTopics");
+const { FirebaseError } = require("../../error");
+const gcp = require("../../gcp");
+const logger = require("../../logger");
+const track = require("../../track");
+const utils = require("../../utils");
+const helper = require("../../functionsDeployHelper");
+const runtimeSelector = require("../../runtimeChoiceSelector");
+const { getAppEngineLocation } = require("../../functionsConfig");
+const { promptOnce } = require("../../prompt");
+const { createOrUpdateSchedulesAndTopics } = require("./createOrUpdateSchedulesAndTopics");
 
-var deploymentTool = require("../../deploymentTool");
-var timings = {};
-var deployments = [];
-var failedDeployments = [];
+const deploymentTool = require("../../deploymentTool");
+const timings = {};
+let deployments = [];
+let failedDeployments = [];
 
 const DEFAULT_PUBLIC_POLICY = {
   version: 3,
@@ -44,7 +44,7 @@ function _endTimer(name) {
   }
 
   // hrtime returns a duration as an array of [seconds, nanos]
-  var duration = process.hrtime(timings[name].t0);
+  const duration = process.hrtime(timings[name].t0);
   track(
     "Functions Deploy (Duration)",
     timings[name].type,
@@ -58,7 +58,7 @@ function _fetchTriggerUrls(projectId, ops, sourceUrl) {
     return Promise.resolve();
   }
   return gcp.cloudfunctions.listAll(projectId).then(function(functions) {
-    var httpFunctions = _.chain(functions)
+    const httpFunctions = _.chain(functions)
       .filter({ sourceUploadUrl: sourceUrl })
       .filter("httpsTrigger")
       .value();
@@ -72,7 +72,7 @@ function _fetchTriggerUrls(projectId, ops, sourceUrl) {
   });
 }
 
-var printSuccess = function(op) {
+const printSuccess = function(op) {
   _endTimer(op.func);
   utils.logSuccess(
     clc.bold.green("functions[" + helper.getFunctionLabel(op.func) + "]: ") +
@@ -88,7 +88,7 @@ var printSuccess = function(op) {
     );
   }
 };
-var printFail = function(op) {
+const printFail = function(op) {
   _endTimer(op.func);
   failedDeployments.push(helper.getFunctionName(op.func));
   utils.logWarning(
@@ -107,7 +107,7 @@ var printFail = function(op) {
   }
 };
 
-var printTooManyOps = function(projectId) {
+const printTooManyOps = function(projectId) {
   utils.logWarning(
     clc.bold.yellow("functions:") + " too many functions are being deployed, cannot poll status."
   );
@@ -125,15 +125,15 @@ module.exports = function(context, options, payload) {
     return Promise.resolve();
   }
 
-  var projectId = context.projectId;
-  var sourceUrl = context.uploadUrl;
-  var appEngineLocation = getAppEngineLocation(context.firebaseConfig);
+  const projectId = context.projectId;
+  const sourceUrl = context.uploadUrl;
+  const appEngineLocation = getAppEngineLocation(context.firebaseConfig);
   // Used in CLI releases v3.4.0 to v3.17.6
-  var legacySourceUrlTwo =
+  const legacySourceUrlTwo =
     "gs://" + "staging." + context.firebaseConfig.storageBucket + "/firebase-functions-source";
   // Used in CLI releases v3.3.0 and prior
-  var legacySourceUrlOne = "gs://" + projectId + "-gcf/" + projectId;
-  var functionsInfo = helper.getFunctionsInfo(payload.functions.triggers, projectId);
+  const legacySourceUrlOne = "gs://" + projectId + "-gcf/" + projectId;
+  let functionsInfo = helper.getFunctionsInfo(payload.functions.triggers, projectId);
   functionsInfo = functionsInfo.map((fn) => {
     if (
       fn.eventTrigger &&
@@ -146,28 +146,32 @@ module.exports = function(context, options, payload) {
     }
     return fn;
   });
-  var uploadedNames = _.map(functionsInfo, "name");
-  var functionFilterGroups = helper.getFilterGroups(options);
-  var deleteReleaseNames;
-  var existingScheduledFunctions;
+  const uploadedNames = _.map(functionsInfo, "name");
+  const functionFilterGroups = helper.getFilterGroups(options);
+  let deleteReleaseNames;
+  let existingScheduledFunctions;
 
   delete payload.functions;
   return gcp.cloudfunctions
     .listAll(projectId)
     .then(function(existingFunctions) {
-      var pluckName = function(functionObject) {
+      const pluckName = function(functionObject) {
         return _.get(functionObject, "name"); // e.g.'projects/proj1/locations/us-central1/functions/func'
       };
 
-      var existingNames = _.map(existingFunctions, pluckName);
-      var isScheduled = function(functionObject) {
+      const existingNames = _.map(existingFunctions, pluckName);
+      const isScheduled = function(functionObject) {
         return _.get(functionObject, "labels.deployment-scheduled") === "true";
       };
       existingScheduledFunctions = _.chain(existingFunctions)
         .filter(isScheduled)
         .map(pluckName)
         .value();
-      var releaseNames = helper.getReleaseNames(uploadedNames, existingNames, functionFilterGroups);
+      const releaseNames = helper.getReleaseNames(
+        uploadedNames,
+        existingNames,
+        functionFilterGroups
+      );
       // If not using function filters, then `deleteReleaseNames` should be equivalent to existingNames so that intersection is a noop
       deleteReleaseNames = functionFilterGroups.length > 0 ? releaseNames : existingNames;
 
@@ -178,11 +182,11 @@ module.exports = function(context, options, payload) {
         .difference(existingNames)
         .intersection(releaseNames)
         .forEach(function(name) {
-          var functionInfo = _.find(functionsInfo, { name: name });
-          var functionTrigger = helper.getFunctionTrigger(functionInfo);
-          var functionName = helper.getFunctionName(name);
-          var region = helper.getRegion(name);
-          var runtime = context.runtimeChoice || helper.getDefaultRuntime();
+          const functionInfo = _.find(functionsInfo, { name: name });
+          const functionTrigger = helper.getFunctionTrigger(functionInfo);
+          const functionName = helper.getFunctionName(name);
+          const region = helper.getRegion(name);
+          const runtime = context.runtimeChoice || helper.getDefaultRuntime();
           utils.logBullet(
             clc.bold.cyan("functions: ") +
               "creating " +
@@ -192,7 +196,7 @@ module.exports = function(context, options, payload) {
               "..."
           );
           logger.debug("Trigger is: ", JSON.stringify(functionTrigger));
-          var eventType = functionTrigger.eventTrigger
+          const eventType = functionTrigger.eventTrigger
             ? functionTrigger.eventTrigger.eventType
             : "https";
           _startTimer(name, "create");
@@ -242,19 +246,19 @@ module.exports = function(context, options, payload) {
         .intersection(existingNames)
         .intersection(releaseNames)
         .forEach(function(name) {
-          var functionInfo = _.find(functionsInfo, { name: name });
-          var functionTrigger = helper.getFunctionTrigger(functionInfo);
-          var functionName = helper.getFunctionName(name);
-          var region = helper.getRegion(name);
+          const functionInfo = _.find(functionsInfo, { name: name });
+          const functionTrigger = helper.getFunctionTrigger(functionInfo);
+          const functionName = helper.getFunctionName(name);
+          const region = helper.getRegion(name);
 
-          var eventType = functionTrigger.eventTrigger
+          const eventType = functionTrigger.eventTrigger
             ? functionTrigger.eventTrigger.eventType
             : "https";
-          var existingFunction = _.find(existingFunctions, {
+          const existingFunction = _.find(existingFunctions, {
             name: name,
           });
-          var existingEventType = _.get(existingFunction, "eventTrigger.eventType");
-          var migratingTrigger = false;
+          const existingEventType = _.get(existingFunction, "eventTrigger.eventType");
+          let migratingTrigger = false;
           if (
             eventType.match(/google.storage.object./) &&
             existingEventType === "providers/cloud.storage/eventTypes/object.change"
@@ -278,7 +282,7 @@ module.exports = function(context, options, payload) {
                 " for how to change the trigger without losing events.\n"
             );
           } else {
-            var options = {
+            const options = {
               projectId: projectId,
               region: region,
               functionName: functionName,
@@ -292,7 +296,7 @@ module.exports = function(context, options, payload) {
             if (context.runtimeChoice) {
               options.runtime = context.runtimeChoice;
             }
-            var runtime = options.runtime || _.get(existingFunction, "runtime", "nodejs6"); // legacy functions are Node 6
+            const runtime = options.runtime || _.get(existingFunction, "runtime", "nodejs6"); // legacy functions are Node 6
             utils.logBullet(
               clc.bold.cyan("functions: ") +
                 "updating " +
@@ -316,7 +320,7 @@ module.exports = function(context, options, payload) {
         .value();
 
       // Delete functions
-      var functionsToDelete = _.chain(existingFunctions)
+      const functionsToDelete = _.chain(existingFunctions)
         .filter(function(functionInfo) {
           if (typeof functionInfo.labels === "undefined") {
             return (
@@ -334,12 +338,12 @@ module.exports = function(context, options, payload) {
       if (functionsToDelete.length === 0) {
         return Promise.resolve();
       }
-      var deleteList = _.map(functionsToDelete, function(func) {
+      const deleteList = _.map(functionsToDelete, function(func) {
         return "\t" + helper.getFunctionLabel(func);
       }).join("\n");
 
       if (options.nonInteractive && !options.force) {
-        var deleteCommands = _.map(functionsToDelete, function(func) {
+        const deleteCommands = _.map(functionsToDelete, function(func) {
           return (
             "\tfirebase functions:delete " +
             helper.getFunctionName(func) +
@@ -384,10 +388,10 @@ module.exports = function(context, options, payload) {
           return;
         }
         functionsToDelete.forEach(function(name) {
-          var functionName = helper.getFunctionName(name);
-          var scheduleName = helper.getScheduleName(name, appEngineLocation);
-          var topicName = helper.getTopicName(name);
-          var region = helper.getRegion(name);
+          const functionName = helper.getFunctionName(name);
+          const scheduleName = helper.getScheduleName(name, appEngineLocation);
+          const topicName = helper.getTopicName(name);
+          const region = helper.getRegion(name);
 
           utils.logBullet(
             clc.bold.cyan("functions: ") +
@@ -396,8 +400,8 @@ module.exports = function(context, options, payload) {
               "..."
           );
           _startTimer(name, "delete");
-          var retryFunction;
-          var isScheduledFunction = _.includes(existingScheduledFunctions, name);
+          let retryFunction;
+          const isScheduledFunction = _.includes(existingScheduledFunctions, name);
           if (isScheduledFunction) {
             retryFunction = function() {
               return gcp.cloudscheduler
@@ -458,7 +462,7 @@ module.exports = function(context, options, payload) {
     })
     .then(function() {
       // filter out functions that are excluded via --only and --except flags
-      var functionsInDeploy = functionsInfo.filter((trigger) => {
+      const functionsInDeploy = functionsInfo.filter((trigger) => {
         return functionFilterGroups.length > 0
           ? _.includes(deleteReleaseNames, trigger.name)
           : true;
@@ -480,11 +484,11 @@ module.exports = function(context, options, payload) {
       );
     })
     .then(function(allOps) {
-      var failedCalls = _.chain(allOps)
+      const failedCalls = _.chain(allOps)
         .filter({ state: "rejected" })
         .map("reason")
         .value();
-      var successfulCalls = _.chain(allOps)
+      const successfulCalls = _.chain(allOps)
         .filter({ state: "fulfilled" })
         .map("value")
         .value();

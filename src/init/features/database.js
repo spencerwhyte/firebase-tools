@@ -1,19 +1,19 @@
 "use strict";
 
-var clc = require("cli-color");
-var api = require("../../api");
-var { prompt, promptOnce } = require("../../prompt");
-var logger = require("../../logger");
-var utils = require("../../utils");
-var fsutils = require("../../fsutils");
+const clc = require("cli-color");
+const api = require("../../api");
+const { prompt, promptOnce } = require("../../prompt");
+const logger = require("../../logger");
+const utils = require("../../utils");
+const fsutils = require("../../fsutils");
 
-var defaultRules = JSON.stringify(
+const defaultRules = JSON.stringify(
   { rules: { ".read": "auth != null", ".write": "auth != null" } },
   null,
   2
 );
 
-var _getDBRules = function(instance) {
+const _getDBRules = function(instance) {
   if (!instance) {
     return Promise.resolve(defaultRules);
   }
@@ -27,7 +27,7 @@ var _getDBRules = function(instance) {
     });
 };
 
-var _writeDBRules = function(instance, filename, config) {
+const _writeDBRules = function(instance, filename, config) {
   return _getDBRules(instance)
     .then(function(rules) {
       return config.writeProjectFile(filename, rules);
@@ -49,8 +49,8 @@ var _writeDBRules = function(instance, filename, config) {
 
 module.exports = function(setup, config) {
   setup.config.database = {};
-  var instance = setup.instance;
-  var filename = null;
+  const instance = setup.instance;
+  let filename = null;
 
   logger.info();
   logger.info("Firebase Realtime Database Rules allow you to define how your data should be");
@@ -69,7 +69,7 @@ module.exports = function(setup, config) {
       filename = setup.config.database.rules;
 
       if (fsutils.fileExistsSync(filename)) {
-        var msg =
+        const msg =
           "File " +
           clc.bold(filename) +
           " already exists." +

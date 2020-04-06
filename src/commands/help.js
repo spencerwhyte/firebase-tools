@@ -1,15 +1,15 @@
 "use strict";
 
-var { Command } = require("../command");
+const { Command } = require("../command");
 
-var clc = require("cli-color");
-var logger = require("../logger");
-var utils = require("../utils");
+const clc = require("cli-color");
+const logger = require("../logger");
+const utils = require("../utils");
 
 module.exports = new Command("help [command]")
   .description("display help information")
   .action(function(commandName) {
-    var cmd = this.client.getCommand(commandName);
+    const cmd = this.client.getCommand(commandName);
     if (cmd) {
       cmd.outputHelp();
     } else if (commandName) {

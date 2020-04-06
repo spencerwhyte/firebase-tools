@@ -10,57 +10,57 @@
  * - region defaults to `us-central1`
  */
 
-var expect = require("chai").expect;
-var execSync = require("child_process").execSync;
-var exec = require("child_process").exec;
-var tmp = require("tmp");
-var _ = require("lodash");
-var fs = require("fs-extra");
-var cloudfunctions = require("../lib/gcp/cloudfunctions");
-var api = require("../lib/api");
-var scopes = require("../lib/scopes");
-var { configstore } = require("../lib/configstore");
-var extractTriggers = require("../lib/extractTriggers");
-var functionsConfig = require("../lib/functionsConfig");
+const expect = require("chai").expect;
+const execSync = require("child_process").execSync;
+const exec = require("child_process").exec;
+const tmp = require("tmp");
+const _ = require("lodash");
+const fs = require("fs-extra");
+const cloudfunctions = require("../lib/gcp/cloudfunctions");
+const api = require("../lib/api");
+const scopes = require("../lib/scopes");
+const { configstore } = require("../lib/configstore");
+const extractTriggers = require("../lib/extractTriggers");
+const functionsConfig = require("../lib/functionsConfig");
 
-var clc = require("cli-color");
-var firebase = require("firebase");
+const clc = require("cli-color");
+const firebase = require("firebase");
 
-var functionsSource = __dirname + "/assets/functions_to_test.js";
-var projectDir = __dirname + "/test-project";
-var projectId = process.argv[2] || "functions-integration-test";
-var region = process.argv[3] || "us-central1";
-var httpsTrigger = `https://${region}-${projectId}.cloudfunctions.net/httpsAction`;
-var localFirebase = __dirname + "/../lib/bin/firebase.js";
-var TIMEOUT = 40000;
-var tmpDir;
-var app;
+const functionsSource = __dirname + "/assets/functions_to_test.js";
+const projectDir = __dirname + "/test-project";
+const projectId = process.argv[2] || "functions-integration-test";
+const region = process.argv[3] || "us-central1";
+const httpsTrigger = `https://${region}-${projectId}.cloudfunctions.net/httpsAction`;
+const localFirebase = __dirname + "/../lib/bin/firebase.js";
+const TIMEOUT = 40000;
+let tmpDir;
+let app;
 
-var deleteAllFunctions = function() {
-  var toDelete = _.map(parseFunctionsList(), function(funcName) {
+const deleteAllFunctions = function() {
+  const toDelete = _.map(parseFunctionsList(), function(funcName) {
     return funcName.replace("-", ".");
   });
   return localFirebase + ` functions:delete ${toDelete.join(" ")} -f --project=${projectId}`;
 };
 
 var parseFunctionsList = function() {
-  var triggers = [];
+  const triggers = [];
   extractTriggers(require(functionsSource), triggers);
   return _.map(triggers, "name");
 };
 
-var getUuid = function() {
+const getUuid = function() {
   return Math.floor(Math.random() * 100000000000).toString();
 };
 
-var preTest = async function() {
-  var dir = tmp.dirSync({ prefix: "fntest_" });
+const preTest = async function() {
+  const dir = tmp.dirSync({ prefix: "fntest_" });
   tmpDir = dir.name;
   fs.copySync(projectDir, tmpDir);
   execSync("npm install", { cwd: tmpDir + "/functions", stdio: "ignore", stderr: "ignore" });
   api.setRefreshToken(configstore.get("tokens").refresh_token);
   api.setScopes(scopes.CLOUD_PLATFORM);
-  var accessToken = (await api.getAccessToken()).access_token;
+  const accessToken = (await api.getAccessToken()).access_token;
   api.setAccessToken(accessToken);
 
   return functionsConfig.getFirebaseConfig({ project: projectId }).then(function(config) {
@@ -75,7 +75,7 @@ var preTest = async function() {
   });
 };
 
-var postTest = function(errored) {
+const postTest = function(errored) {
   fs.remove(tmpDir);
   delete process.env.GCLOUD_PROJECT;
   delete process.env.FIREBASE_CONFIG;
@@ -92,8 +92,8 @@ var postTest = function(errored) {
   process.exit();
 };
 
-var checkFunctionsListMatch = function(expectedFunctions) {
-  var deployedFunctions;
+const checkFunctionsListMatch = function(expectedFunctions) {
+  let deployedFunctions;
   return cloudfunctions
     .list(projectId, region)
     .then(function(result) {
@@ -109,7 +109,7 @@ var checkFunctionsListMatch = function(expectedFunctions) {
     });
 };
 
-var testCreateUpdate = function() {
+const testCreateUpdate = function() {
   fs.copySync(functionsSource, tmpDir + "/functions/index.js");
   return new Promise(function(resolve) {
     exec(`${localFirebase} deploy --project=${projectId}`, { cwd: tmpDir }, function(err, stdout) {
@@ -120,7 +120,7 @@ var testCreateUpdate = function() {
   });
 };
 
-var testCreateUpdateWithFilter = function() {
+const testCreateUpdateWithFilter = function() {
   fs.copySync(functionsSource, tmpDir + "/functions/index.js");
   return new Promise(function(resolve) {
     exec(
@@ -135,7 +135,7 @@ var testCreateUpdateWithFilter = function() {
   });
 };
 
-var testDelete = function() {
+const testDelete = function() {
   return new Promise(function(resolve) {
     exec(deleteAllFunctions(), { cwd: tmpDir }, function(err, stdout) {
       console.log(stdout);
@@ -145,7 +145,7 @@ var testDelete = function() {
   });
 };
 
-var testDeleteWithFilter = function() {
+const testDeleteWithFilter = function() {
   return new Promise(function(resolve) {
     exec(
       `${localFirebase} functions:delete nested -f --project=${projectId}`,
@@ -159,7 +159,7 @@ var testDeleteWithFilter = function() {
   });
 };
 
-var testUnknownFilter = function() {
+const testUnknownFilter = function() {
   return new Promise(function(resolve) {
     exec(
       "> functions/index.js &&" +
@@ -177,10 +177,10 @@ var testUnknownFilter = function() {
   });
 };
 
-var waitForAck = function(uuid, testDescription) {
+const waitForAck = function(uuid, testDescription) {
   return Promise.race([
     new Promise(function(resolve) {
-      var ref = firebase
+      const ref = firebase
         .database()
         .ref("output")
         .child(uuid);
@@ -199,8 +199,8 @@ var waitForAck = function(uuid, testDescription) {
   ]);
 };
 
-var writeToDB = function(path) {
-  var uuid = getUuid();
+const writeToDB = function(path) {
+  const uuid = getUuid();
   return app
     .database()
     .ref(path)
@@ -211,7 +211,7 @@ var writeToDB = function(path) {
     });
 };
 
-var sendHttpRequest = function(message) {
+const sendHttpRequest = function(message) {
   return api
     .request("POST", httpsTrigger, {
       data: message,
@@ -223,9 +223,9 @@ var sendHttpRequest = function(message) {
     });
 };
 
-var publishPubsub = function(topic) {
-  var uuid = getUuid();
-  var message = new Buffer(uuid).toString("base64");
+const publishPubsub = function(topic) {
+  const uuid = getUuid();
+  const message = new Buffer(uuid).toString("base64");
   return api
     .request("POST", `/v1/projects/${projectId}/topics/${topic}:publish`, {
       auth: true,
@@ -240,7 +240,7 @@ var publishPubsub = function(topic) {
     });
 };
 
-var triggerSchedule = function(job) {
+const triggerSchedule = function(job) {
   // we can't pass along a uuid thru scheduler to test the full trigger,
   // so instead we run the job to make sure that the scheduler job and pub sub topic were created correctly
   return api
@@ -255,11 +255,11 @@ var triggerSchedule = function(job) {
     });
 };
 
-var saveToStorage = function() {
-  var uuid = getUuid();
-  var contentLength = Buffer.byteLength(uuid, "utf8");
-  var resource = ["b", projectId + ".appspot.com", "o"].join("/");
-  var endpoint = "/upload/storage/v1/" + resource + "?uploadType=media&name=" + uuid;
+const saveToStorage = function() {
+  const uuid = getUuid();
+  const contentLength = Buffer.byteLength(uuid, "utf8");
+  const resource = ["b", projectId + ".appspot.com", "o"].join("/");
+  const endpoint = "/upload/storage/v1/" + resource + "?uploadType=media&name=" + uuid;
   return api
     .request("POST", endpoint, {
       auth: true,
@@ -277,21 +277,21 @@ var saveToStorage = function() {
     });
 };
 
-var testFunctionsTrigger = function() {
-  var checkDbAction = writeToDB("input").then(function(uuid) {
+const testFunctionsTrigger = function() {
+  const checkDbAction = writeToDB("input").then(function(uuid) {
     return waitForAck(uuid, "database triggered function");
   });
-  var checkNestedDbAction = writeToDB("inputNested").then(function(uuid) {
+  const checkNestedDbAction = writeToDB("inputNested").then(function(uuid) {
     return waitForAck(uuid, "nested database triggered function");
   });
-  var checkHttpsAction = sendHttpRequest({ message: "hello" });
-  var checkPubsubAction = publishPubsub("topic1").then(function(uuid) {
+  const checkHttpsAction = sendHttpRequest({ message: "hello" });
+  const checkPubsubAction = publishPubsub("topic1").then(function(uuid) {
     return waitForAck(uuid, "pubsub triggered function");
   });
-  var checkGcsAction = saveToStorage().then(function(uuid) {
+  const checkGcsAction = saveToStorage().then(function(uuid) {
     return waitForAck(uuid, "storage triggered function");
   });
-  var checkScheduleAction = triggerSchedule(
+  const checkScheduleAction = triggerSchedule(
     "firebase-schedule-pubsubScheduleAction-us-central1"
   ).then(function(/* uuid */) {
     return true;
@@ -306,7 +306,7 @@ var testFunctionsTrigger = function() {
   ]);
 };
 
-var main = function() {
+const main = function() {
   preTest()
     .then(function() {
       console.log("Done pretest prep.");

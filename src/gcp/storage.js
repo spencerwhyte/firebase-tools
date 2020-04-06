@@ -1,9 +1,9 @@
 "use strict";
 
-var path = require("path");
-var api = require("../api");
-var logger = require("../logger");
-var { FirebaseError } = require("../error");
+const path = require("path");
+const api = require("../api");
+const logger = require("../logger");
+const { FirebaseError } = require("../error");
 
 function _getDefaultBucket(projectId) {
   return api

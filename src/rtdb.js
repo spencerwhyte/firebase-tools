@@ -1,12 +1,12 @@
 "use strict";
 
-var api = require("./api");
-var { FirebaseError } = require("./error");
-var utils = require("./utils");
+const api = require("./api");
+const { FirebaseError } = require("./error");
+const utils = require("./utils");
 
 exports.updateRules = function(instance, src, options) {
   options = options || {};
-  var url = "/.settings/rules.json";
+  let url = "/.settings/rules.json";
   if (options.dryRun) {
     url += "?dryRun=true";
   }

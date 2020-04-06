@@ -13,9 +13,9 @@ type Work = () => Promise<any>;
  */
 export class WorkQueue {
   private queue: Array<Work> = [];
-  private workRunningCount: number = 0;
+  private workRunningCount = 0;
   private notifyQueue: () => void = () => {};
-  private stopped: boolean = true;
+  private stopped = true;
 
   constructor(private mode: FunctionsExecutionMode = FunctionsExecutionMode.AUTO) {}
 

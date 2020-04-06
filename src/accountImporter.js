@@ -1,13 +1,13 @@
 "use strict";
 
-var clc = require("cli-color");
-var _ = require("lodash");
+const clc = require("cli-color");
+const _ = require("lodash");
 
-var api = require("./api");
-var logger = require("./logger");
-var utils = require("./utils");
+const api = require("./api");
+const logger = require("./logger");
+const utils = require("./utils");
 
-var ALLOWED_JSON_KEYS = [
+const ALLOWED_JSON_KEYS = [
   "localId",
   "email",
   "emailVerified",
@@ -21,14 +21,14 @@ var ALLOWED_JSON_KEYS = [
   "phoneNumber",
   "disabled",
 ];
-var ALLOWED_JSON_KEYS_RENAMING = {
+const ALLOWED_JSON_KEYS_RENAMING = {
   lastSignedInAt: "lastLoginAt",
 };
-var ALLOWED_PROVIDER_USER_INFO_KEYS = ["providerId", "rawId", "email", "displayName", "photoUrl"];
-var ALLOWED_PROVIDER_IDS = ["google.com", "facebook.com", "twitter.com", "github.com"];
+const ALLOWED_PROVIDER_USER_INFO_KEYS = ["providerId", "rawId", "email", "displayName", "photoUrl"];
+const ALLOWED_PROVIDER_IDS = ["google.com", "facebook.com", "twitter.com", "github.com"];
 
-var _isValidBase64 = function(str) {
-  var expected = Buffer.from(str, "base64").toString("base64");
+const _isValidBase64 = function(str) {
+  const expected = Buffer.from(str, "base64").toString("base64");
   // Buffer automatically pads with '=' character,
   // but input string might not have padding.
   if (str.length < expected.length && str.slice(-1) !== "=") {
@@ -37,14 +37,14 @@ var _isValidBase64 = function(str) {
   return expected === str;
 };
 
-var _toWebSafeBase64 = function(data) {
+const _toWebSafeBase64 = function(data) {
   return data
     .toString("base64")
     .replace(/\//g, "_")
     .replace(/\+/g, "-");
 };
 
-var _addProviderUserInfo = function(user, providerId, arr) {
+const _addProviderUserInfo = function(user, providerId, arr) {
   if (arr[0]) {
     user.providerUserInfo.push({
       providerId: providerId,
@@ -56,8 +56,8 @@ var _addProviderUserInfo = function(user, providerId, arr) {
   }
 };
 
-var _genUploadAccountPostBody = function(projectId, accounts, hashOptions) {
-  var postBody = {
+const _genUploadAccountPostBody = function(projectId, accounts, hashOptions) {
+  const postBody = {
     users: accounts.map(function(account) {
       if (account.passwordHash) {
         account.passwordHash = _toWebSafeBase64(account.passwordHash);
@@ -108,8 +108,8 @@ var _genUploadAccountPostBody = function(projectId, accounts, hashOptions) {
   return postBody;
 };
 
-var transArrayToUser = function(arr) {
-  var user = {
+const transArrayToUser = function(arr) {
+  const user = {
     localId: arr[0],
     email: arr[1],
     emailVerified: arr[2] === "true",
@@ -141,12 +141,12 @@ var transArrayToUser = function(arr) {
   return user;
 };
 
-var validateOptions = function(options) {
-  var hashOptions = _validateRequiredParameters(options);
+const validateOptions = function(options) {
+  const hashOptions = _validateRequiredParameters(options);
   if (!hashOptions.valid) {
     return hashOptions;
   }
-  var hashInputOrder = options.hashInputOrder ? options.hashInputOrder.toUpperCase() : undefined;
+  const hashInputOrder = options.hashInputOrder ? options.hashInputOrder.toUpperCase() : undefined;
   if (hashInputOrder) {
     if (hashInputOrder != "SALT_FIRST" && hashInputOrder != "PASSWORD_FIRST") {
       return utils.reject("Unknown password hash order flag", { exit: 1 });
@@ -163,7 +163,7 @@ var _validateRequiredParameters = function(options) {
     utils.logWarning("No hash algorithm specified. Password users cannot be imported.");
     return { valid: true };
   }
-  var hashAlgo = options.hashAlgo.toUpperCase();
+  const hashAlgo = options.hashAlgo.toUpperCase();
   let roundsNum;
   switch (hashAlgo) {
     case "HMAC_SHA512":
@@ -254,13 +254,13 @@ var _validateRequiredParameters = function(options) {
   }
 };
 
-var _validateProviderUserInfo = function(providerUserInfo) {
+const _validateProviderUserInfo = function(providerUserInfo) {
   if (!_.includes(ALLOWED_PROVIDER_IDS, providerUserInfo.providerId)) {
     return {
       error: JSON.stringify(providerUserInfo, null, 2) + " has unsupported providerId",
     };
   }
-  var keydiff = _.difference(_.keys(providerUserInfo), ALLOWED_PROVIDER_USER_INFO_KEYS);
+  const keydiff = _.difference(_.keys(providerUserInfo), ALLOWED_PROVIDER_USER_INFO_KEYS);
   if (keydiff.length) {
     return {
       error:
@@ -270,22 +270,22 @@ var _validateProviderUserInfo = function(providerUserInfo) {
   return {};
 };
 
-var validateUserJson = function(userJson) {
-  var keydiff = _.difference(_.keys(userJson), ALLOWED_JSON_KEYS);
+const validateUserJson = function(userJson) {
+  const keydiff = _.difference(_.keys(userJson), ALLOWED_JSON_KEYS);
   if (keydiff.length) {
     return {
       error: JSON.stringify(userJson, null, 2) + " has unsupported keys: " + keydiff.join(","),
     };
   }
   if (userJson.providerUserInfo) {
-    for (var i = 0; i < userJson.providerUserInfo.length; i++) {
-      var res = _validateProviderUserInfo(userJson.providerUserInfo[i]);
+    for (let i = 0; i < userJson.providerUserInfo.length; i++) {
+      const res = _validateProviderUserInfo(userJson.providerUserInfo[i]);
       if (res.error) {
         return res;
       }
     }
   }
-  var badFormat = JSON.stringify(userJson, null, 2) + " has invalid data format: ";
+  const badFormat = JSON.stringify(userJson, null, 2) + " has invalid data format: ";
   if (userJson.passwordHash && !_isValidBase64(userJson.passwordHash)) {
     return {
       error: badFormat + "Password hash should be base64 encoded.",
@@ -299,7 +299,7 @@ var validateUserJson = function(userJson) {
   return {};
 };
 
-var _sendRequest = function(projectId, userList, hashOptions) {
+const _sendRequest = function(projectId, userList, hashOptions) {
   logger.info("Starting importing " + userList.length + " account(s).");
   return api
     .request("POST", "/identitytoolkit/v3/relyingparty/uploadAccount", {
@@ -334,7 +334,7 @@ var serialImportUsers = function(projectId, hashOptions, userListArr, index) {
   });
 };
 
-var accountImporter = {
+const accountImporter = {
   validateOptions: validateOptions,
   validateUserJson: validateUserJson,
   transArrayToUser: transArrayToUser,

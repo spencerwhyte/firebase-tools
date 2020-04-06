@@ -1,17 +1,17 @@
 "use strict";
 
-var chai = require("chai");
-var sinon = require("sinon");
-var api = require("../api");
-var accountImporter = require("../accountImporter");
-var helpers = require("./helpers");
+const chai = require("chai");
+const sinon = require("sinon");
+const api = require("../api");
+const accountImporter = require("../accountImporter");
+const helpers = require("./helpers");
 
-var expect = chai.expect;
+const expect = chai.expect;
 describe("accountImporter", function() {
-  var transArrayToUser = accountImporter.transArrayToUser;
-  var validateOptions = accountImporter.validateOptions;
-  var validateUserJson = accountImporter.validateUserJson;
-  var serialImportUsers = accountImporter.serialImportUsers;
+  const transArrayToUser = accountImporter.transArrayToUser;
+  const validateOptions = accountImporter.validateOptions;
+  const validateUserJson = accountImporter.validateUserJson;
+  const serialImportUsers = accountImporter.serialImportUsers;
 
   describe("transArrayToUser", function() {
     it("should reject when passwordHash is invalid base64", function() {
@@ -99,20 +99,20 @@ describe("accountImporter", function() {
   });
 
   describe("serialImportUsers", function() {
-    var sandbox;
-    var mockApi;
-    var batches = [];
-    var hashOptions = {
+    let sandbox;
+    let mockApi;
+    let batches = [];
+    const hashOptions = {
       hashAlgo: "HMAC_SHA1",
       hashKey: "a2V5MTIz",
     };
-    var expectedResponse = [];
+    let expectedResponse = [];
 
     beforeEach(function() {
       sandbox = sinon.createSandbox();
       helpers.mockAuth(sandbox);
       mockApi = sandbox.mock(api);
-      for (var i = 0; i < 10; i++) {
+      for (let i = 0; i < 10; i++) {
         batches.push([
           {
             localId: i.toString(),
@@ -135,7 +135,7 @@ describe("accountImporter", function() {
     });
 
     it("should call api.request multiple times", function(done) {
-      for (var i = 0; i < batches.length; i++) {
+      for (let i = 0; i < batches.length; i++) {
         mockApi
           .expects("request")
           .withArgs("POST", "/identitytoolkit/v3/relyingparty/uploadAccount", {
@@ -170,7 +170,7 @@ describe("accountImporter", function() {
           ],
         },
       };
-      for (var i = 0; i < batches.length; i++) {
+      for (let i = 0; i < batches.length; i++) {
         mockApi
           .expects("request")
           .withArgs("POST", "/identitytoolkit/v3/relyingparty/uploadAccount", {

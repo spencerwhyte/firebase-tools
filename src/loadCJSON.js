@@ -1,7 +1,7 @@
 "use strict";
 
-var { FirebaseError } = require("./error");
-var cjson = require("cjson");
+const { FirebaseError } = require("./error");
+const cjson = require("cjson");
 
 module.exports = function(path) {
   try {

@@ -1,13 +1,13 @@
 "use strict";
 
-var { Command } = require("../command");
-var logger = require("../logger");
-var { configstore } = require("../configstore");
-var clc = require("cli-color");
-var utils = require("../utils");
-var { prompt } = require("../prompt");
+const { Command } = require("../command");
+const logger = require("../logger");
+const { configstore } = require("../configstore");
+const clc = require("cli-color");
+const utils = require("../utils");
+const { prompt } = require("../prompt");
 
-var auth = require("../auth");
+const auth = require("../auth");
 
 module.exports = new Command("login")
   .description("log the CLI into Firebase")
@@ -26,8 +26,8 @@ module.exports = new Command("login")
       );
     }
 
-    var user = configstore.get("user");
-    var tokens = configstore.get("tokens");
+    const user = configstore.get("user");
+    const tokens = configstore.get("tokens");
 
     if (user && tokens && !options.reauth) {
       logger.info("Already logged in as", clc.bold(user.email));

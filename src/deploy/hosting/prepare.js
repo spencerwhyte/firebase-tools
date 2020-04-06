@@ -35,7 +35,7 @@ module.exports = function(context, options) {
   const versionCreates = [];
 
   _.each(context.hosting.deploys, function(deploy) {
-    let cfg = deploy.config;
+    const cfg = deploy.config;
 
     if (cfg.target) {
       const matchingTargets = options.rc.requireTarget(options.project, "hosting", cfg.target);

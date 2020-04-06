@@ -1,17 +1,17 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
-var path = require("path");
+const _ = require("lodash");
+const clc = require("cli-color");
+const path = require("path");
 
-var { FirebaseError } = require("../../error");
-var parseBoltRules = require("../../parseBoltRules");
-var rtdb = require("../../rtdb");
-var utils = require("../../utils");
+const { FirebaseError } = require("../../error");
+const parseBoltRules = require("../../parseBoltRules");
+const rtdb = require("../../rtdb");
+const utils = require("../../utils");
 
 module.exports = function(context, options) {
-  var rulesConfig = options.config.get("database");
-  var next = Promise.resolve();
+  let rulesConfig = options.config.get("database");
+  const next = Promise.resolve();
 
   if (!rulesConfig) {
     return next;
@@ -21,8 +21,8 @@ module.exports = function(context, options) {
     rulesConfig = [_.assign(rulesConfig, { instance: options.instance })];
   }
 
-  var ruleFiles = {};
-  var deploys = [];
+  const ruleFiles = {};
+  let deploys = [];
 
   rulesConfig.forEach(function(ruleConfig) {
     if (!ruleConfig.rules) {
@@ -33,7 +33,7 @@ module.exports = function(context, options) {
 
     if (ruleConfig.target) {
       options.rc.requireTarget(context.projectId, "database", ruleConfig.target);
-      var instances = options.rc.target(context.projectId, "database", ruleConfig.target);
+      const instances = options.rc.target(context.projectId, "database", ruleConfig.target);
       deploys = deploys.concat(
         instances.map(function(inst) {
           return { instance: inst, rules: ruleConfig.rules };

@@ -1,12 +1,12 @@
 "use strict";
 
-var _ = require("lodash");
-var request = require("request");
+const _ = require("lodash");
+const request = require("request");
 
-var { encodeFirestoreValue } = require("./firestore/encodeFirestoreValue");
-var utils = require("./utils");
+const { encodeFirestoreValue } = require("./firestore/encodeFirestoreValue");
+const utils = require("./utils");
 
-var LocalFunction = function(trigger, urls, controller) {
+const LocalFunction = function(trigger, urls, controller) {
   const isCallable = _.get(trigger, ["labels", "deployment-callable"], "false");
 
   this.name = trigger.name;
@@ -39,10 +39,10 @@ LocalFunction.prototype._isFirestoreFunc = function(eventTrigger) {
 };
 
 LocalFunction.prototype._substituteParams = function(resource, params) {
-  var wildcardRegex = new RegExp("{[^/{}]*}", "g");
+  const wildcardRegex = new RegExp("{[^/{}]*}", "g");
   return resource.replace(wildcardRegex, function(wildcard) {
-    var wildcardNoBraces = wildcard.slice(1, -1); // .slice removes '{' and '}' from wildcard
-    var sub = _.get(params, wildcardNoBraces);
+    const wildcardNoBraces = wildcard.slice(1, -1); // .slice removes '{' and '}' from wildcard
+    const sub = _.get(params, wildcardNoBraces);
     return sub || wildcardNoBraces + _.random(1, 9);
   });
 };
@@ -50,7 +50,7 @@ LocalFunction.prototype._substituteParams = function(resource, params) {
 LocalFunction.prototype._constructCallableFunc = function(data, opts) {
   opts = opts || {};
 
-  var headers = {};
+  const headers = {};
   if (_.has(opts.instanceIdToken)) {
     headers["Firebase-Instance-ID-Token"] = opts.instanceIdToken;
   }
@@ -114,7 +114,7 @@ LocalFunction.prototype._makeFirestoreValue = function(input) {
   if (typeof input !== "object") {
     throw new Error("Firestore data must be key-value pairs.");
   }
-  var currentTime = new Date().toISOString();
+  const currentTime = new Date().toISOString();
   return {
     fields: encodeFirestoreValue(input),
     createTime: currentTime,
@@ -126,12 +126,12 @@ LocalFunction.prototype._requestCallBack = function(err, response, body) {
   if (err) {
     return console.warn("\nERROR SENDING REQUEST: " + err);
   }
-  var status = response ? response.statusCode + ", " : "";
+  const status = response ? response.statusCode + ", " : "";
 
   // If the body is a string we want to check if we can parse it as JSON
   // and pretty-print it. We can't blindly stringify because stringifying
   // a string results in some ugly escaping.
-  var bodyString = body;
+  let bodyString = body;
   if (typeof body === "string") {
     try {
       bodyString = JSON.stringify(JSON.parse(bodyString), null, 2);
@@ -147,8 +147,8 @@ LocalFunction.prototype._requestCallBack = function(err, response, body) {
 
 LocalFunction.prototype._call = function(data, opts) {
   opts = opts || {};
-  var operationType;
-  var dataPayload;
+  let operationType;
+  let dataPayload;
 
   if (this.httpsTrigger) {
     this.controller.call(this.name, data || {});

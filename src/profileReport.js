@@ -1,32 +1,30 @@
 "use strict";
 
-var clc = require("cli-color");
-var Table = require("cli-table");
-var fs = require("fs");
-var _ = require("lodash");
-var readline = require("readline");
+const clc = require("cli-color");
+const Table = require("cli-table");
+const fs = require("fs");
+const _ = require("lodash");
+const readline = require("readline");
 
-var { FirebaseError } = require("./error");
-var logger = require("./logger");
-var utils = require("./utils");
+const { FirebaseError } = require("./error");
+const logger = require("./logger");
+const utils = require("./utils");
 
-var DATA_LINE_REGEX = /^data: /;
-
-var BANDWIDTH_NOTE =
+const BANDWIDTH_NOTE =
   "NOTE: The numbers reported here are only estimates of the data" +
   " payloads from read operations. They are NOT a valid measure of your bandwidth bill.";
 
-var SPEED_NOTE =
+const SPEED_NOTE =
   "NOTE: Speeds are reported at millisecond resolution and" +
   " are not the latencies that clients will see. Pending times" +
   " are also reported at millisecond resolution. They approximate" +
   " the interval of time between the instant a request is received" +
   " and the instant it executes.";
 
-var COLLAPSE_THRESHOLD = 25;
-var COLLAPSE_WILDCARD = ["$wildcard"];
+const COLLAPSE_THRESHOLD = 25;
+const COLLAPSE_WILDCARD = ["$wildcard"];
 
-var ProfileReport = function(tmpFile, outStream, options) {
+const ProfileReport = function(tmpFile, outStream, options) {
   this.tempFile = tmpFile;
   this.output = outStream;
   this.options = options;
@@ -49,7 +47,7 @@ var ProfileReport = function(tmpFile, outStream, options) {
 // 'static' helper methods
 
 ProfileReport.extractJSON = function(line, input) {
-  if (!input && !DATA_LINE_REGEX.test(line)) {
+  if (!input && !line.startsWith("data: ")) {
     return null;
   } else if (!input) {
     line = line.substring(5);
@@ -66,7 +64,7 @@ ProfileReport.pathString = function(path) {
 };
 
 ProfileReport.formatNumber = function(num) {
-  var parts = num.toFixed(2).split(".");
+  const parts = num.toFixed(2).split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   if (+parts[1] === 0) {
     return parts[0];
@@ -75,13 +73,13 @@ ProfileReport.formatNumber = function(num) {
 };
 
 ProfileReport.formatBytes = function(bytes) {
-  var threshold = 1000;
+  const threshold = 1000;
   if (Math.round(bytes) < threshold) {
     return bytes + " B";
   }
-  var units = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  var u = -1;
-  var formattedBytes = bytes;
+  const units = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  let u = -1;
+  let formattedBytes = bytes;
   do {
     formattedBytes /= threshold;
     u++;
@@ -93,7 +91,7 @@ ProfileReport.extractReadableIndex = function(query) {
   if (_.has(query, "orderBy")) {
     return query.orderBy;
   }
-  var indexPath = _.get(query, "index.path");
+  const indexPath = _.get(query, "index.path");
   if (indexPath) {
     return ProfileReport.pathString(indexPath);
   }
@@ -107,18 +105,18 @@ ProfileReport.prototype.collectUnindexed = function(data, path) {
   if (!_.has(this.state.unindexed, path)) {
     this.state.unindexed[path] = {};
   }
-  var pathNode = this.state.unindexed[path];
+  const pathNode = this.state.unindexed[path];
   // There is only ever one query.
-  var query = data.querySet[0];
+  const query = data.querySet[0];
   // Get a unique string for this query.
-  var index = JSON.stringify(query.index);
+  const index = JSON.stringify(query.index);
   if (!_.has(pathNode, index)) {
     pathNode[index] = {
       times: 0,
       query: query,
     };
   }
-  var indexNode = pathNode[index];
+  const indexNode = pathNode[index];
   indexNode.times += 1;
 };
 
@@ -155,7 +153,7 @@ ProfileReport.prototype.collectSpeed = function(data, path, opType) {
       rejected: 0,
     };
   }
-  var node = opType[path];
+  const node = opType[path];
   node.times += 1;
   /*
    * If `millis` is not present, we assume that the operation is fast
@@ -183,7 +181,7 @@ ProfileReport.prototype.collectBandwidth = function(bytes, path, direction) {
       bytes: 0,
     };
   }
-  var node = direction[path];
+  const node = direction[path];
   node.times += 1;
   node.bytes += bytes;
 };
@@ -220,7 +218,7 @@ ProfileReport.prototype.processOperation = function(data) {
     this.state.startTime = data.timestamp;
   }
   this.state.endTime = data.timestamp;
-  var path = ProfileReport.pathString(data.path);
+  const path = ProfileReport.pathString(data.path);
   this.state.opCount++;
   switch (data.name) {
     case "concurrent-connect":
@@ -278,37 +276,37 @@ ProfileReport.prototype.collapsePaths = function(pathedObject, combiner, pathInd
   if (_.isUndefined(pathIndex)) {
     pathIndex = 1;
   }
-  var allSegments = _.keys(pathedObject).map(function(path) {
+  const allSegments = _.keys(pathedObject).map(function(path) {
     return path.split("/").filter(function(s) {
       return s !== "";
     });
   });
-  var pathSegments = allSegments.filter(function(segments) {
+  const pathSegments = allSegments.filter(function(segments) {
     return segments.length > pathIndex;
   });
-  var otherSegments = allSegments.filter(function(segments) {
+  const otherSegments = allSegments.filter(function(segments) {
     return segments.length <= pathIndex;
   });
   if (pathSegments.length === 0) {
     return pathedObject;
   }
-  var prefixes = {};
+  const prefixes = {};
   // Count path prefixes for the index.
   pathSegments.forEach(function(segments) {
-    var prefixPath = ProfileReport.pathString(segments.slice(0, pathIndex));
-    var prefixCount = _.get(prefixes, prefixPath, new Set());
+    const prefixPath = ProfileReport.pathString(segments.slice(0, pathIndex));
+    const prefixCount = _.get(prefixes, prefixPath, new Set());
     prefixes[prefixPath] = prefixCount.add(segments[pathIndex]);
   });
-  var collapsedObject = {};
+  const collapsedObject = {};
   pathSegments.forEach(function(segments) {
-    var prefix = segments.slice(0, pathIndex);
-    var prefixPath = ProfileReport.pathString(prefix);
-    var prefixCount = _.get(prefixes, prefixPath);
-    var originalPath = ProfileReport.pathString(segments);
+    const prefix = segments.slice(0, pathIndex);
+    const prefixPath = ProfileReport.pathString(prefix);
+    const prefixCount = _.get(prefixes, prefixPath);
+    const originalPath = ProfileReport.pathString(segments);
     if (prefixCount.size >= COLLAPSE_THRESHOLD) {
-      var tail = segments.slice(pathIndex + 1);
-      var collapsedPath = ProfileReport.pathString(prefix.concat(COLLAPSE_WILDCARD).concat(tail));
-      var currentValue = collapsedObject[collapsedPath];
+      const tail = segments.slice(pathIndex + 1);
+      const collapsedPath = ProfileReport.pathString(prefix.concat(COLLAPSE_WILDCARD).concat(tail));
+      const currentValue = collapsedObject[collapsedPath];
       if (currentValue) {
         collapsedObject[collapsedPath] = combiner(currentValue, pathedObject[originalPath]);
       } else {
@@ -319,7 +317,7 @@ ProfileReport.prototype.collapsePaths = function(pathedObject, combiner, pathInd
     }
   });
   otherSegments.forEach(function(segments) {
-    var originalPath = ProfileReport.pathString(segments);
+    const originalPath = ProfileReport.pathString(segments);
     collapsedObject[originalPath] = pathedObject[originalPath];
   });
   // Do this again, but down a level.
@@ -327,14 +325,14 @@ ProfileReport.prototype.collapsePaths = function(pathedObject, combiner, pathInd
 };
 
 ProfileReport.prototype.renderUnindexedData = function() {
-  var table = new Table({
+  const table = new Table({
     head: ["Path", "Index", "Count"],
     style: {
       head: this.options.isFile ? [] : ["yellow"],
       border: this.options.isFile ? [] : ["grey"],
     },
   });
-  var unindexed = this.collapsePaths(this.state.unindexed, function(u1, u2) {
+  const unindexed = this.collapsePaths(this.state.unindexed, function(u1, u2) {
     _.mergeWith(u1, u2, function(p1, p2) {
       return {
         times: p1.times + p2.times,
@@ -342,12 +340,12 @@ ProfileReport.prototype.renderUnindexedData = function() {
       };
     });
   });
-  var paths = _.keys(unindexed);
+  const paths = _.keys(unindexed);
   paths.forEach(function(path) {
-    var indices = _.keys(unindexed[path]);
+    const indices = _.keys(unindexed[path]);
     indices.forEach(function(index) {
-      var data = unindexed[path][index];
-      var row = [
+      const data = unindexed[path][index];
+      const row = [
         path,
         ProfileReport.extractReadableIndex(data.query),
         ProfileReport.formatNumber(data.times),
@@ -359,31 +357,31 @@ ProfileReport.prototype.renderUnindexedData = function() {
 };
 
 ProfileReport.prototype.renderBandwidth = function(pureData) {
-  var table = new Table({
+  const table = new Table({
     head: ["Path", "Total", "Count", "Average"],
     style: {
       head: this.options.isFile ? [] : ["yellow"],
       border: this.options.isFile ? [] : ["grey"],
     },
   });
-  var data = this.collapsePaths(pureData, function(b1, b2) {
+  const data = this.collapsePaths(pureData, function(b1, b2) {
     return {
       bytes: b1.bytes + b2.bytes,
       times: b1.times + b2.times,
     };
   });
-  var paths = _.keys(data);
+  let paths = _.keys(data);
   paths = _.orderBy(
     paths,
     function(path) {
-      var bandwidth = data[path];
+      const bandwidth = data[path];
       return bandwidth.bytes;
     },
     ["desc"]
   );
   paths.forEach(function(path) {
-    var bandwidth = data[path];
-    var row = [
+    const bandwidth = data[path];
+    const row = [
       path,
       ProfileReport.formatBytes(bandwidth.bytes),
       ProfileReport.formatNumber(bandwidth.times),
@@ -411,11 +409,11 @@ ProfileReport.prototype.renderIncomingBandwidth = function() {
  * `path` table column.
  */
 ProfileReport.prototype.renderUnpathedOperationSpeed = function(speedData, hasSecurity) {
-  var head = ["Count", "Average Execution Speed", "Average Pending Time"];
+  const head = ["Count", "Average Execution Speed", "Average Pending Time"];
   if (hasSecurity) {
     head.push("Permission Denied");
   }
-  var table = new Table({
+  const table = new Table({
     head: head,
     style: {
       head: this.options.isFile ? [] : ["yellow"],
@@ -427,7 +425,7 @@ ProfileReport.prototype.renderUnpathedOperationSpeed = function(speedData, hasSe
    * be empty.
    */
   if (Object.keys(speedData).length > 0) {
-    var row = [
+    const row = [
       speedData.times,
       ProfileReport.formatNumber(speedData.millis / speedData.times) + " ms",
       ProfileReport.formatNumber(
@@ -443,18 +441,18 @@ ProfileReport.prototype.renderUnpathedOperationSpeed = function(speedData, hasSe
 };
 
 ProfileReport.prototype.renderOperationSpeed = function(pureData, hasSecurity) {
-  var head = ["Path", "Count", "Average Execution Speed", "Average Pending Time"];
+  const head = ["Path", "Count", "Average Execution Speed", "Average Pending Time"];
   if (hasSecurity) {
     head.push("Permission Denied");
   }
-  var table = new Table({
+  const table = new Table({
     head: head,
     style: {
       head: this.options.isFile ? [] : ["yellow"],
       border: this.options.isFile ? [] : ["grey"],
     },
   });
-  var data = this.collapsePaths(pureData, function(s1, s2) {
+  const data = this.collapsePaths(pureData, function(s1, s2) {
     return {
       times: s1.times + s2.times,
       millis: s1.millis + s2.millis,
@@ -463,18 +461,18 @@ ProfileReport.prototype.renderOperationSpeed = function(pureData, hasSecurity) {
       rejected: s1.rejected + s2.rejected,
     };
   });
-  var paths = _.keys(data);
+  let paths = _.keys(data);
   paths = _.orderBy(
     paths,
     function(path) {
-      var speed = data[path];
+      const speed = data[path];
       return speed.millis / speed.times;
     },
     ["desc"]
   );
   paths.forEach(function(path) {
-    var speed = data[path];
-    var row = [
+    const speed = data[path];
+    const row = [
       path,
       speed.times,
       ProfileReport.formatNumber(speed.millis / speed.times) + " ms",
@@ -515,17 +513,17 @@ ProfileReport.prototype.renderUnlistenSpeed = function() {
 };
 
 ProfileReport.prototype.parse = function(onLine, onClose) {
-  var isFile = this.options.isFile;
-  var tmpFile = this.tempFile;
-  var outStream = this.output;
-  var isInput = this.options.isInput;
+  const isFile = this.options.isFile;
+  const tmpFile = this.tempFile;
+  const outStream = this.output;
+  const isInput = this.options.isInput;
   return new Promise(function(resolve, reject) {
-    var rl = readline.createInterface({
+    const rl = readline.createInterface({
       input: fs.createReadStream(tmpFile),
     });
-    var errored = false;
+    let errored = false;
     rl.on("line", function(line) {
-      var data = ProfileReport.extractJSON(line, isInput);
+      const data = ProfileReport.extractJSON(line, isInput);
       if (!data) {
         return;
       }
@@ -535,7 +533,7 @@ ProfileReport.prototype.parse = function(onLine, onClose) {
       if (errored) {
         reject(new FirebaseError("There was an error creating the report."));
       } else {
-        var result = onClose();
+        const result = onClose();
         if (isFile) {
           // Only resolve once the data is flushed.
           outStream.on("finish", function() {
@@ -596,17 +594,17 @@ ProfileReport.prototype.generateText = function() {
 };
 
 ProfileReport.prototype.outputText = function() {
-  var totalTime = this.state.endTime - this.state.startTime;
-  var isFile = this.options.isFile;
-  var write = this.write.bind(this);
-  var writeTitle = function(title) {
+  const totalTime = this.state.endTime - this.state.startTime;
+  const isFile = this.options.isFile;
+  const write = this.write.bind(this);
+  const writeTitle = function(title) {
     if (isFile) {
       write(title + "\n");
     } else {
       write(clc.bold.yellow(title) + "\n");
     }
   };
-  var writeTable = function(title, table) {
+  const writeTable = function(title, table) {
     writeTitle(title);
     write(table.toString() + "\n");
   };
@@ -637,9 +635,9 @@ ProfileReport.prototype.generateJson = function() {
 };
 
 ProfileReport.prototype.outputJson = function() {
-  var totalTime = this.state.endTime - this.state.startTime;
-  var tableToJson = function(table, note) {
-    var json = {
+  const totalTime = this.state.endTime - this.state.startTime;
+  const tableToJson = function(table, note) {
+    const json = {
       legend: table.options.head,
       data: [],
     };
@@ -651,7 +649,7 @@ ProfileReport.prototype.outputJson = function() {
     });
     return json;
   };
-  var json = {
+  const json = {
     totalTime: totalTime,
     readSpeed: tableToJson(this.renderReadSpeed(), SPEED_NOTE),
     writeSpeed: tableToJson(this.renderWriteSpeed(), SPEED_NOTE),

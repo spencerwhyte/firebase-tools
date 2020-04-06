@@ -1,16 +1,16 @@
 "use strict";
 
-var clc = require("cli-color");
+const clc = require("cli-color");
 
-var { Command } = require("../command");
-var requireConfig = require("../requireConfig");
-var utils = require("../utils");
+const { Command } = require("../command");
+const requireConfig = require("../requireConfig");
+const utils = require("../utils");
 
 module.exports = new Command("target:remove <type> <resource>")
   .description("remove a resource target")
   .before(requireConfig)
   .action(function(type, resource, options) {
-    var name = options.rc.removeTarget(options.project, type, resource);
+    const name = options.rc.removeTarget(options.project, type, resource);
     if (name) {
       utils.logSuccess(
         "Removed " + type + " target " + clc.bold(name) + " from " + clc.bold(resource)

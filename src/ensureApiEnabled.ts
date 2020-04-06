@@ -11,7 +11,7 @@ export async function check(
   projectId: string,
   apiName: string,
   prefix: string,
-  silent: boolean = false
+  silent = false
 ): Promise<boolean> {
   const response = await api.request("GET", `/v1/projects/${projectId}/services/${apiName}`, {
     auth: true,
@@ -36,7 +36,7 @@ export async function ensure(
   projectId: string,
   apiName: string,
   prefix: string,
-  silent: boolean = false
+  silent = false
 ): Promise<void> {
   if (!silent) {
     utils.logLabeledBullet(prefix, "ensuring necessary APIs are enabled...");
@@ -57,7 +57,7 @@ async function pollCheckEnabled(
   prefix: string,
   silent: boolean,
   enablementRetries: number,
-  pollRetries: number = 0
+  pollRetries = 0
 ): Promise<void> {
   if (pollRetries > POLLS_BEFORE_RETRY) {
     return enableApiWithRetries(projectId, apiName, prefix, silent, enablementRetries + 1);

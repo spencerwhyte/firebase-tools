@@ -1,12 +1,12 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
+const _ = require("lodash");
+const clc = require("cli-color");
 
-var { Command } = require("../command");
-var logger = require("../logger");
-var requireConfig = require("../requireConfig");
-var utils = require("../utils");
+const { Command } = require("../command");
+const logger = require("../logger");
+const requireConfig = require("../requireConfig");
+const utils = require("../utils");
 
 function _logTargets(type, targets) {
   logger.info(clc.cyan("[ " + type + " ]"));
@@ -26,12 +26,12 @@ module.exports = new Command("target [type]")
     logger.info("Resource targets for", clc.bold(options.project) + ":");
     logger.info();
     if (type) {
-      var targets = options.rc.targets(options.project, type);
+      const targets = options.rc.targets(options.project, type);
       _logTargets(type, targets);
       return Promise.resolve(targets);
     }
 
-    var allTargets = options.rc.get(["targets", options.project], {});
+    const allTargets = options.rc.get(["targets", options.project], {});
     _.forEach(allTargets, function(ts, tp) {
       _logTargets(tp, ts);
     });

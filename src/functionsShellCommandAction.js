@@ -1,16 +1,16 @@
 "use strict";
 
-var repl = require("repl");
-var _ = require("lodash");
+const repl = require("repl");
+const _ = require("lodash");
 
-var request = require("request");
-var util = require("util");
+const request = require("request");
+const util = require("util");
 
-var serveFunctions = require("./serve/functions");
-var LocalFunction = require("./localFunction");
-var logger = require("./logger");
-var shell = require("./emulator/functionsEmulatorShell");
-var commandUtitls = require("./emulator/commandUtils");
+const serveFunctions = require("./serve/functions");
+const LocalFunction = require("./localFunction");
+const logger = require("./logger");
+const shell = require("./emulator/functionsEmulatorShell");
+const commandUtitls = require("./emulator/commandUtils");
 
 module.exports = function(options) {
   options.port = parseInt(options.port, 10);
@@ -40,7 +40,7 @@ module.exports = function(options) {
         process.exit();
       }
 
-      var writer = function(output) {
+      const writer = function(output) {
         // Prevent full print out of Request object when a request is made
         if (output instanceof request.Request) {
           return "Sent request to function.";
@@ -48,17 +48,17 @@ module.exports = function(options) {
         return util.inspect(output);
       };
 
-      var prompt = "firebase > ";
+      const prompt = "firebase > ";
 
-      var replServer = repl.start({
+      const replServer = repl.start({
         prompt: prompt,
         writer: writer,
         useColors: true,
       });
       _.forEach(emulator.triggers, function(trigger) {
         if (_.includes(emulator.emulatedFunctions, trigger.name)) {
-          var localFunction = new LocalFunction(trigger, emulator.urls, emulator);
-          var triggerNameDotNotation = trigger.name.replace(/\-/g, ".");
+          const localFunction = new LocalFunction(trigger, emulator.urls, emulator);
+          const triggerNameDotNotation = trigger.name.replace(/\-/g, ".");
           _.set(replServer.context, triggerNameDotNotation, localFunction.call);
         }
       });

@@ -1,13 +1,13 @@
 "use strict";
 
-var clc = require("cli-color");
+const clc = require("cli-color");
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var logger = require("../../../logger");
-var { prompt } = require("../../../prompt");
-var enableApi = require("../../../ensureApiEnabled").enable;
-var { requirePermissions } = require("../../../requirePermissions");
+const logger = require("../../../logger");
+const { prompt } = require("../../../prompt");
+const enableApi = require("../../../ensureApiEnabled").enable;
+const { requirePermissions } = require("../../../requirePermissions");
 
 module.exports = function(setup, config) {
   logger.info();
@@ -20,8 +20,8 @@ module.exports = function(setup, config) {
   logger.info();
 
   setup.functions = {};
-  var projectId = _.get(setup, "rcfile.projects.default");
-  var enableApis = Promise.resolve();
+  const projectId = _.get(setup, "rcfile.projects.default");
+  let enableApis = Promise.resolve();
   if (projectId) {
     enableApis = requirePermissions({ project: projectId }).then(() => {
       return Promise.all([

@@ -1,9 +1,9 @@
 "use strict";
 
-var api = require("../api");
-var utils = require("../utils");
+const api = require("../api");
+const utils = require("../utils");
 
-var API_VERSION = "v1";
+const API_VERSION = "v1";
 
 /**
  * Returns whether or not project has billing enabled.

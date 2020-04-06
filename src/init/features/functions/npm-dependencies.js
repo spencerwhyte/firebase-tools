@@ -1,9 +1,9 @@
 "use strict";
 
-var spawn = require("cross-spawn");
+const spawn = require("cross-spawn");
 
-var logger = require("../../../logger");
-var { prompt } = require("../../../prompt");
+const logger = require("../../../logger");
+const { prompt } = require("../../../prompt");
 
 exports.askInstallDependencies = function(setup, config) {
   return prompt(setup, [
@@ -16,7 +16,7 @@ exports.askInstallDependencies = function(setup, config) {
   ]).then(function() {
     if (setup.npm) {
       return new Promise(function(resolve) {
-        var installer = spawn("npm", ["install"], {
+        const installer = spawn("npm", ["install"], {
           cwd: config.projectDir + "/functions",
           stdio: "inherit",
         });

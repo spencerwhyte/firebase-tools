@@ -1,19 +1,19 @@
 "use strict";
 
-var { Command } = require("../command");
-var requireInstance = require("../requireInstance");
-var { requirePermissions } = require("../requirePermissions");
-var request = require("request");
-var api = require("../api");
-var responseToError = require("../responseToError");
-var { FirebaseError } = require("../error");
+const { Command } = require("../command");
+const requireInstance = require("../requireInstance");
+const { requirePermissions } = require("../requirePermissions");
+const request = require("request");
+const api = require("../api");
+const responseToError = require("../responseToError");
+const { FirebaseError } = require("../error");
 
-var utils = require("../utils");
-var querystring = require("querystring");
-var _ = require("lodash");
-var fs = require("fs");
+const utils = require("../utils");
+const querystring = require("querystring");
+const _ = require("lodash");
+const fs = require("fs");
 
-var _applyStringOpts = function(dest, src, keys, jsonKeys) {
+const _applyStringOpts = function(dest, src, keys, jsonKeys) {
   _.forEach(keys, function(key) {
     if (src[key]) {
       dest[key] = src[key];
@@ -22,7 +22,7 @@ var _applyStringOpts = function(dest, src, keys, jsonKeys) {
 
   // some keys need JSON encoding of the querystring value
   _.forEach(jsonKeys, function(key) {
-    var jsonVal;
+    let jsonVal;
     try {
       jsonVal = JSON.parse(src[key]);
     } catch (e) {
@@ -60,8 +60,8 @@ module.exports = new Command("database:get <path>")
       return utils.reject("Path must begin with /", { exit: 1 });
     }
 
-    var url = utils.addSubdomain(api.realtimeOrigin, options.instance) + path + ".json?";
-    var query = {};
+    let url = utils.addSubdomain(api.realtimeOrigin, options.instance) + path + ".json?";
+    const query = {};
     if (options.shallow) {
       query.shallow = "true";
     }
@@ -86,17 +86,17 @@ module.exports = new Command("database:get <path>")
 
     url += querystring.stringify(query);
 
-    var reqOptions = {
+    const reqOptions = {
       url: url,
     };
 
     return api.addRequestHeaders(reqOptions).then(function(reqOptionsWithToken) {
       return new Promise(function(resolve, reject) {
-        var fileOut = !!options.output;
-        var outStream = fileOut ? fs.createWriteStream(options.output) : process.stdout;
-        var erroring;
-        var errorResponse = "";
-        var response;
+        const fileOut = !!options.output;
+        const outStream = fileOut ? fs.createWriteStream(options.output) : process.stdout;
+        let erroring;
+        let errorResponse = "";
+        let response;
 
         request
           .get(reqOptionsWithToken)
@@ -119,7 +119,7 @@ module.exports = new Command("database:get <path>")
             });
             if (erroring) {
               try {
-                var data = JSON.parse(errorResponse);
+                const data = JSON.parse(errorResponse);
                 return reject(responseToError(response, data));
               } catch (e) {
                 return reject(

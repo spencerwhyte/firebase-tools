@@ -1,10 +1,10 @@
 "use strict";
 
-var { Command } = require("../command");
-var clc = require("cli-color");
-var utils = require("../utils");
-var logger = require("../logger");
-var auth = require("../auth");
+const { Command } = require("../command");
+const clc = require("cli-color");
+const utils = require("../utils");
+const logger = require("../logger");
+const auth = require("../auth");
 
 module.exports = new Command("login:ci")
   .description("generate an access token for use in non-interactive environments")

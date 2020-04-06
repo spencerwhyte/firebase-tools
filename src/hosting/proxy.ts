@@ -41,7 +41,7 @@ export function proxyRequestHandler(url: string, rewriteIdentifier: string): Req
     // functions cookie is not a string[].
     const cookie = (req.headers.cookie as string) || "";
     const sessionCookie = cookie.split(/; ?/).find((c: string) => {
-      return c.trim().indexOf("__session=") === 0;
+      return c.trim().startsWith("__session=");
     });
 
     const proxied = request({
@@ -88,7 +88,7 @@ export function proxyRequestHandler(url: string, rewriteIdentifier: string): Req
       }
 
       // don't allow cookies to be set on non-private cached responses
-      if (response.headers["cache-control"].indexOf("private") < 0) {
+      if (!response.headers["cache-control"].includes("private")) {
         delete response.headers["set-cookie"];
       }
 

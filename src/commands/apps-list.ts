@@ -25,7 +25,7 @@ function logAppsList(apps: AppMetadata[]): void {
   logger.info(table.toString());
 }
 
-function logAppCount(count: number = 0): void {
+function logAppCount(count = 0): void {
   if (count === 0) {
     return;
   }
@@ -40,7 +40,7 @@ module.exports = new Command("apps:list [platform]")
   )
   .before(requireAuth)
   .action(
-    async (platform: string = "", options: any): Promise<AppMetadata[]> => {
+    async (platform = "", options: any): Promise<AppMetadata[]> => {
       const projectId = getProjectId(options);
       const appPlatform = getAppPlatform(platform);
 

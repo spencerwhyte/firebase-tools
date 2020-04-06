@@ -1,9 +1,9 @@
 "use strict";
 
-var auth = require("../../auth");
+const auth = require("../../auth");
 
 exports.mockAuth = function(sandbox) {
-  var authMock = sandbox.mock(auth);
+  const authMock = sandbox.mock(auth);
   authMock
     .expects("getAccessToken")
     .atLeast(1)

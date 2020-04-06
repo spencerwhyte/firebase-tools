@@ -1,23 +1,23 @@
 "use strict";
 
-var csv = require("csv-streamify");
-var clc = require("cli-color");
-var fs = require("fs");
-var jsonStream = require("JSONStream");
-var _ = require("lodash");
+const csv = require("csv-streamify");
+const clc = require("cli-color");
+const fs = require("fs");
+const jsonStream = require("JSONStream");
+const _ = require("lodash");
 
-var { Command } = require("../command");
-var accountImporter = require("../accountImporter");
-var getProjectId = require("../getProjectId");
-var logger = require("../logger");
-var { requirePermissions } = require("../requirePermissions");
-var utils = require("../utils");
+const { Command } = require("../command");
+const accountImporter = require("../accountImporter");
+const getProjectId = require("../getProjectId");
+const logger = require("../logger");
+const { requirePermissions } = require("../requirePermissions");
+const utils = require("../utils");
 
-var MAX_BATCH_SIZE = 1000;
-var validateOptions = accountImporter.validateOptions;
-var validateUserJson = accountImporter.validateUserJson;
-var transArrayToUser = accountImporter.transArrayToUser;
-var serialImportUsers = accountImporter.serialImportUsers;
+const MAX_BATCH_SIZE = 1000;
+const validateOptions = accountImporter.validateOptions;
+const validateUserJson = accountImporter.validateUserJson;
+const transArrayToUser = accountImporter.transArrayToUser;
+const serialImportUsers = accountImporter.serialImportUsers;
 
 module.exports = new Command("auth:import [dataFile]")
   .description("import users into your Firebase project from a data file(.csv or .json)")
@@ -45,35 +45,35 @@ module.exports = new Command("auth:import [dataFile]")
   )
   .before(requirePermissions, ["firebaseauth.users.create", "firebaseauth.users.update"])
   .action(function(dataFile, options) {
-    var projectId = getProjectId(options);
-    var checkRes = validateOptions(options);
+    const projectId = getProjectId(options);
+    const checkRes = validateOptions(options);
     if (!checkRes.valid) {
       return checkRes;
     }
-    var hashOptions = checkRes;
+    const hashOptions = checkRes;
 
     if (!_.endsWith(dataFile, ".csv") && !_.endsWith(dataFile, ".json")) {
       return utils.reject("Data file must end with .csv or .json", { exit: 1 });
     }
-    var stats = fs.statSync(dataFile);
-    var fileSizeInBytes = stats.size;
+    const stats = fs.statSync(dataFile);
+    const fileSizeInBytes = stats.size;
     logger.info("Processing " + clc.bold(dataFile) + " (" + fileSizeInBytes + " bytes)");
 
-    var inStream = fs.createReadStream(dataFile);
-    var batches = [];
-    var currentBatch = [];
-    var counter = 0;
+    const inStream = fs.createReadStream(dataFile);
+    const batches = [];
+    let currentBatch = [];
+    let counter = 0;
     return new Promise(function(resolve, reject) {
-      var parser;
+      let parser;
       if (dataFile.endsWith(".csv")) {
         parser = csv({ objectMode: true });
         parser
           .on("data", function(line) {
             counter++;
-            var user = transArrayToUser(
+            const user = transArrayToUser(
               line.map(function(str) {
                 // Ignore starting '|'' and trailing '|''
-                var newStr = str.trim().replace(/^["|'](.*)["|']$/, "$1");
+                const newStr = str.trim().replace(/^["|'](.*)["|']$/, "$1");
                 return newStr === "" ? undefined : newStr;
               })
             );
@@ -100,7 +100,7 @@ module.exports = new Command("auth:import [dataFile]")
         parser
           .on("data", function(pair) {
             counter++;
-            var res = validateUserJson(pair.value);
+            const res = validateUserJson(pair.value);
             if (res.error) {
               return reject(res.error);
             }

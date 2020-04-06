@@ -1,10 +1,10 @@
 "use strict";
 
-var { Command } = require("../command");
-var { requirePermissions } = require("../requirePermissions");
-var action = require("../functionsShellCommandAction");
-var requireConfig = require("../requireConfig");
-var commandUtils = require("../emulator/commandUtils");
+const { Command } = require("../command");
+const { requirePermissions } = require("../requirePermissions");
+const action = require("../functionsShellCommandAction");
+const requireConfig = require("../requireConfig");
+const commandUtils = require("../emulator/commandUtils");
 
 module.exports = new Command("functions:shell")
   .description("launch full Node shell with emulated functions")

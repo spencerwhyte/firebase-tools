@@ -1,18 +1,18 @@
 "use strict";
 
-var { Command } = require("../command");
-var requireInstance = require("../requireInstance");
-var { requirePermissions } = require("../requirePermissions");
-var request = require("request");
-var api = require("../api");
-var responseToError = require("../responseToError");
-var { FirebaseError } = require("../error");
+const { Command } = require("../command");
+const requireInstance = require("../requireInstance");
+const { requirePermissions } = require("../requirePermissions");
+const request = require("request");
+const api = require("../api");
+const responseToError = require("../responseToError");
+const { FirebaseError } = require("../error");
 
-var utils = require("../utils");
-var clc = require("cli-color");
-var logger = require("../logger");
-var fs = require("fs");
-var _ = require("lodash");
+const utils = require("../utils");
+const clc = require("cli-color");
+const logger = require("../logger");
+const fs = require("fs");
+const _ = require("lodash");
 
 module.exports = new Command("database:push <path> [infile]")
   .description("add a new JSON object to a list of data in your Firebase")
@@ -28,15 +28,15 @@ module.exports = new Command("database:push <path> [infile]")
       return utils.reject("Path must begin with /", { exit: 1 });
     }
 
-    var inStream =
+    const inStream =
       utils.stringToStream(options.data) || (infile ? fs.createReadStream(infile) : process.stdin);
-    var url = utils.addSubdomain(api.realtimeOrigin, options.instance) + path + ".json?";
+    const url = utils.addSubdomain(api.realtimeOrigin, options.instance) + path + ".json?";
 
     if (!infile && !options.data) {
       utils.explainStdin();
     }
 
-    var reqOptions = {
+    const reqOptions = {
       url: url,
       json: true,
     };
@@ -60,7 +60,10 @@ module.exports = new Command("database:push <path> [infile]")
               path += "/";
             }
 
-            var consoleUrl = utils.consoleUrl(options.project, "/database/data" + path + body.name);
+            const consoleUrl = utils.consoleUrl(
+              options.project,
+              "/database/data" + path + body.name
+            );
 
             utils.logSuccess("Data pushed successfully");
             logger.info();

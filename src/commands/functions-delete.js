@@ -1,17 +1,17 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var { Command } = require("../command");
-var clc = require("cli-color");
-var cloudfunctions = require("../gcp/cloudfunctions");
-var functionsConfig = require("../functionsConfig");
-var functionsDelete = require("../functionsDelete");
-var getProjectId = require("../getProjectId");
-var helper = require("../functionsDeployHelper");
-var { prompt } = require("../prompt");
-var { requirePermissions } = require("../requirePermissions");
-var utils = require("../utils");
+const { Command } = require("../command");
+const clc = require("cli-color");
+const cloudfunctions = require("../gcp/cloudfunctions");
+const functionsConfig = require("../functionsConfig");
+const functionsDelete = require("../functionsDelete");
+const getProjectId = require("../getProjectId");
+const helper = require("../functionsDeployHelper");
+const { prompt } = require("../prompt");
+const { requirePermissions } = require("../requirePermissions");
+const utils = require("../utils");
 
 module.exports = new Command("functions:delete [filters...]")
   .description("delete one or more Cloud Functions by name or group name.")
@@ -27,12 +27,12 @@ module.exports = new Command("functions:delete [filters...]")
       return utils.reject("Must supply at least function or group name.");
     }
 
-    var projectId = getProjectId(options);
-    var appEngineLocation;
-    var functionsToDelete = [];
+    const projectId = getProjectId(options);
+    let appEngineLocation;
+    let functionsToDelete = [];
 
     // Dot notation can be used to indicate function inside of a group
-    var filterChunks = _.map(filters, function(filter) {
+    const filterChunks = _.map(filters, function(filter) {
       return filter.split(".");
     });
     return functionsConfig
@@ -44,10 +44,12 @@ module.exports = new Command("functions:delete [filters...]")
         return cloudfunctions
           .listAll(projectId)
           .then(function(result) {
-            var allFunctions = _.map(result, "name");
+            const allFunctions = _.map(result, "name");
             return _.filter(allFunctions, function(name) {
-              var regionMatches = options.region ? helper.getRegion(name) === options.region : true;
-              var nameMatches = _.some(
+              const regionMatches = options.region
+                ? helper.getRegion(name) === options.region
+                : true;
+              const nameMatches = _.some(
                 _.map(filterChunks, function(chunk) {
                   return helper.functionMatchesGroup(name, chunk);
                 })
@@ -65,7 +67,7 @@ module.exports = new Command("functions:delete [filters...]")
                 { exit: 1 }
               );
             }
-            var deleteList = _.map(functionsToDelete, function(func) {
+            const deleteList = _.map(functionsToDelete, function(func) {
               return "\t" + helper.getFunctionLabel(func);
             }).join("\n");
             if (!options.force) {

@@ -1,10 +1,10 @@
 "use strict";
 
-var _ = require("lodash");
-var { FirebaseError } = require("./error");
+const _ = require("lodash");
+const { FirebaseError } = require("./error");
 
 module.exports = function(options, validTargets) {
-  var targets = validTargets.filter(function(t) {
+  let targets = validTargets.filter(function(t) {
     return options.config.has(t);
   });
   if (options.only) {

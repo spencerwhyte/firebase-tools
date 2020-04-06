@@ -1,14 +1,14 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var clc = require("cli-color");
-var { FirebaseError } = require("./error");
-var functionsConfig = require("./functionsConfig");
-var runtimeconfig = require("./gcp/runtimeconfig");
+const clc = require("cli-color");
+const { FirebaseError } = require("./error");
+const functionsConfig = require("./functionsConfig");
+const runtimeconfig = require("./gcp/runtimeconfig");
 
 // Tests whether short is a prefix of long
-var _matchPrefix = function(short, long) {
+const _matchPrefix = function(short, long) {
   if (short.length > long.length) {
     return false;
   }
@@ -21,20 +21,20 @@ var _matchPrefix = function(short, long) {
   );
 };
 
-var _applyExcept = function(json, except) {
+const _applyExcept = function(json, except) {
   _.forEach(except, function(key) {
     _.unset(json, key);
   });
 };
 
-var _cloneVariable = function(varName, toProject) {
+const _cloneVariable = function(varName, toProject) {
   return runtimeconfig.variables.get(varName).then(function(variable) {
-    var id = functionsConfig.varNameToIds(variable.name);
+    const id = functionsConfig.varNameToIds(variable.name);
     return runtimeconfig.variables.set(toProject, id.config, id.variable, variable.text);
   });
 };
 
-var _cloneConfig = function(configName, toProject) {
+const _cloneConfig = function(configName, toProject) {
   return runtimeconfig.variables.list(configName).then(function(variables) {
     return Promise.all(
       _.map(variables, function(variable) {
@@ -44,20 +44,20 @@ var _cloneConfig = function(configName, toProject) {
   });
 };
 
-var _cloneConfigOrVariable = function(key, fromProject, toProject) {
-  var parts = key.split(".");
+const _cloneConfigOrVariable = function(key, fromProject, toProject) {
+  const parts = key.split(".");
   if (_.includes(exports.RESERVED_NAMESPACES, parts[0])) {
     throw new FirebaseError("Cannot clone reserved namespace " + clc.bold(parts[0]));
   }
-  var configName = _.join(["projects", fromProject, "configs", parts[0]], "/");
+  const configName = _.join(["projects", fromProject, "configs", parts[0]], "/");
   if (parts.length === 1) {
     return _cloneConfig(configName, toProject);
   }
   return runtimeconfig.variables.list(configName).then(function(variables) {
-    var promises = [];
+    const promises = [];
     _.forEach(variables, function(variable) {
-      var varId = functionsConfig.varNameToIds(variable.name).variable;
-      var variablePrefixFilter = parts.slice(1);
+      const varId = functionsConfig.varNameToIds(variable.name).variable;
+      const variablePrefixFilter = parts.slice(1);
       if (_matchPrefix(variablePrefixFilter, varId.split("/"))) {
         promises.push(_cloneVariable(variable.name, toProject));
       }

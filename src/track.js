@@ -1,20 +1,20 @@
 "use strict";
 
-var ua = require("universal-analytics");
+const ua = require("universal-analytics");
 
-var _ = require("lodash");
-var { configstore } = require("./configstore");
-var pkg = require("../package.json");
-var uuid = require("uuid");
-var logger = require("./logger");
+const _ = require("lodash");
+const { configstore } = require("./configstore");
+const pkg = require("../package.json");
+const uuid = require("uuid");
+const logger = require("./logger");
 
-var anonId = configstore.get("analytics-uuid");
+let anonId = configstore.get("analytics-uuid");
 if (!anonId) {
   anonId = uuid.v4();
   configstore.set("analytics-uuid", anonId);
 }
 
-var visitor = ua(process.env.FIREBASE_ANALYTICS_UA || "UA-29174744-3", anonId, {
+const visitor = ua(process.env.FIREBASE_ANALYTICS_UA || "UA-29174744-3", anonId, {
   strictCidFormat: false,
   https: true,
 });

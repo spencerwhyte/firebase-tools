@@ -1,13 +1,13 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var { Command } = require("../command");
-var getProjectId = require("../getProjectId");
-var { requirePermissions } = require("../requirePermissions");
-var runtimeconfig = require("../gcp/runtimeconfig");
-var functionsConfig = require("../functionsConfig");
-var logger = require("../logger");
+const { Command } = require("../command");
+const getProjectId = require("../getProjectId");
+const { requirePermissions } = require("../requirePermissions");
+const runtimeconfig = require("../gcp/runtimeconfig");
+const functionsConfig = require("../functionsConfig");
+const logger = require("../logger");
 
 module.exports = new Command("functions:config:legacy")
   .description("get legacy functions config variables")
@@ -18,22 +18,22 @@ module.exports = new Command("functions:config:legacy")
     "runtimeconfig.variables.get",
   ])
   .action(function(options) {
-    var projectId = getProjectId(options);
-    var metaPath = "projects/" + projectId + "/configs/firebase/variables/meta";
+    const projectId = getProjectId(options);
+    const metaPath = "projects/" + projectId + "/configs/firebase/variables/meta";
     return runtimeconfig.variables
       .get(metaPath)
       .then(function(result) {
-        var metaVal = JSON.parse(result.text);
+        const metaVal = JSON.parse(result.text);
         if (!_.has(metaVal, "version")) {
           logger.info("You do not have any legacy config variables.");
           return null;
         }
-        var latestVarPath = functionsConfig.idsToVarName(projectId, "firebase", metaVal.version);
+        const latestVarPath = functionsConfig.idsToVarName(projectId, "firebase", metaVal.version);
         return runtimeconfig.variables.get(latestVarPath);
       })
       .then(function(latest) {
         if (latest !== null) {
-          var latestVal = JSON.parse(latest.text);
+          const latestVal = JSON.parse(latest.text);
           logger.info(JSON.stringify(latestVal, null, 2));
           return latestVal;
         }

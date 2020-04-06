@@ -1,21 +1,21 @@
 "use strict";
 
-var _ = require("lodash");
-var { Command } = require("../command");
-var getProjectId = require("../getProjectId");
-var logger = require("../logger");
-var { requirePermissions } = require("../requirePermissions");
-var functionsConfig = require("../functionsConfig");
+const _ = require("lodash");
+const { Command } = require("../command");
+const getProjectId = require("../getProjectId");
+const logger = require("../logger");
+const { requirePermissions } = require("../requirePermissions");
+const functionsConfig = require("../functionsConfig");
 
 function _materialize(projectId, path) {
   if (_.isUndefined(path)) {
     return functionsConfig.materializeAll(projectId);
   }
-  var parts = path.split(".");
-  var configId = parts[0];
-  var configName = _.join(["projects", projectId, "configs", configId], "/");
+  const parts = path.split(".");
+  const configId = parts[0];
+  const configName = _.join(["projects", projectId, "configs", configId], "/");
   return functionsConfig.materializeConfig(configName, {}).then(function(result) {
-    var query = _.chain(parts)
+    const query = _.chain(parts)
       .join(".")
       .value();
     return query ? _.get(result, query) : result;

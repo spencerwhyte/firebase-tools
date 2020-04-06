@@ -1,13 +1,13 @@
 "use strict";
 
-var clc = require("cli-color");
-var { Command } = require("../command");
-var FirestoreDelete = require("../firestore/delete");
-var { prompt } = require("../prompt");
-var { requirePermissions } = require("../requirePermissions");
-var utils = require("../utils");
+const clc = require("cli-color");
+const { Command } = require("../command");
+const FirestoreDelete = require("../firestore/delete");
+const { prompt } = require("../prompt");
+const { requirePermissions } = require("../requirePermissions");
+const utils = require("../utils");
 
-var _getConfirmationMessage = function(deleteOp, options) {
+const _getConfirmationMessage = function(deleteOp, options) {
   if (options.allCollections) {
     return (
       "You are about to delete " +
@@ -77,13 +77,13 @@ module.exports = new Command("firestore:delete [path]")
       return utils.reject("Must specify a path.", { exit: 1 });
     }
 
-    var deleteOp = new FirestoreDelete(options.project, path, {
+    const deleteOp = new FirestoreDelete(options.project, path, {
       recursive: options.recursive,
       shallow: options.shallow,
       allCollections: options.allCollections,
     });
 
-    var checkPrompt;
+    let checkPrompt;
     if (options.yes) {
       checkPrompt = Promise.resolve({ confirm: true });
     } else {

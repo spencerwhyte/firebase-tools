@@ -1,18 +1,18 @@
 "use strict";
 
-var clc = require("cli-color");
-var ProgressBar = require("progress");
+const clc = require("cli-color");
+const ProgressBar = require("progress");
 
-var api = require("../api");
-var firestore = require("../gcp/firestore");
-var { FirebaseError } = require("../error");
-var logger = require("../logger");
-var utils = require("../utils");
+const api = require("../api");
+const firestore = require("../gcp/firestore");
+const { FirebaseError } = require("../error");
+const logger = require("../logger");
+const utils = require("../utils");
 
 // Datastore allowed numeric IDs where Firestore only allows strings. Numeric IDs are
 // exposed to Firestore as __idNUM__, so this is the lowest possible negative numeric
 // value expressed in that format.
-var MIN_ID = "__id-9223372036854775808__";
+const MIN_ID = "__id-9223372036854775808__";
 
 /**
  * Construct a new Firestore delete operation.
@@ -37,7 +37,7 @@ function FirestoreDelete(project, path, options) {
   this.allDescendants = this.recursive;
   this.root = "projects/" + project + "/databases/(default)/documents";
 
-  var segments = this.path.split("/");
+  const segments = this.path.split("/");
   this.isDocumentPath = segments.length % 2 === 0;
   this.isCollectionPath = !this.isDocumentPath;
 
@@ -71,13 +71,13 @@ FirestoreDelete.prototype._validateOptions = function() {
     throw new FirebaseError("Must pass recursive or shallow option when deleting a collection.");
   }
 
-  var pieces = this.path.split("/");
+  const pieces = this.path.split("/");
 
   if (pieces.length === 0) {
     throw new FirebaseError("Path length must be greater than zero.");
   }
 
-  var hasEmptySegment = pieces.some(function(piece) {
+  const hasEmptySegment = pieces.some(function(piece) {
     return piece.length === 0;
   });
 
@@ -102,12 +102,12 @@ FirestoreDelete.prototype._collectionDescendantsQuery = function(
   batchSize,
   startAfter
 ) {
-  var nullChar = String.fromCharCode(0);
+  const nullChar = String.fromCharCode(0);
 
-  var startAt = this.root + "/" + this.path + "/" + MIN_ID;
-  var endAt = this.root + "/" + this.path + nullChar + "/" + MIN_ID;
+  const startAt = this.root + "/" + this.path + "/" + MIN_ID;
+  const endAt = this.root + "/" + this.path + nullChar + "/" + MIN_ID;
 
-  var where = {
+  const where = {
     compositeFilter: {
       op: "AND",
       filters: [
@@ -137,7 +137,7 @@ FirestoreDelete.prototype._collectionDescendantsQuery = function(
     },
   };
 
-  var query = {
+  const query = {
     structuredQuery: {
       where: where,
       limit: batchSize,
@@ -177,7 +177,7 @@ FirestoreDelete.prototype._collectionDescendantsQuery = function(
  * @return {object} a StructuredQuery.
  */
 FirestoreDelete.prototype._docDescendantsQuery = function(allDescendants, batchSize, startAfter) {
-  var query = {
+  const query = {
     structuredQuery: {
       limit: batchSize,
       from: [
@@ -214,8 +214,8 @@ FirestoreDelete.prototype._docDescendantsQuery = function(allDescendants, batchS
  * @return {Promise<object[]>} a promise for an array of documents.
  */
 FirestoreDelete.prototype._getDescendantBatch = function(allDescendants, batchSize, startAfter) {
-  var url = this.parent + ":runQuery";
-  var body;
+  const url = this.parent + ":runQuery";
+  let body;
   if (this.isDocumentPath) {
     body = this._docDescendantsQuery(allDescendants, batchSize, startAfter);
   } else {
@@ -255,25 +255,25 @@ FirestoreDelete.progressBar = new ProgressBar("Deleted :current docs (:rate docs
  * @return {Promise} a promise for the entire operation.
  */
 FirestoreDelete.prototype._recursiveBatchDelete = function() {
-  var self = this;
+  const self = this;
 
   // Tunable deletion parameters
-  var readBatchSize = 7500;
-  var deleteBatchSize = 250;
-  var maxPendingDeletes = 15;
-  var maxQueueSize = deleteBatchSize * maxPendingDeletes * 2;
+  const readBatchSize = 7500;
+  const deleteBatchSize = 250;
+  const maxPendingDeletes = 15;
+  const maxQueueSize = deleteBatchSize * maxPendingDeletes * 2;
 
   // All temporary variables for the deletion queue.
-  var queue = [];
-  var numPendingDeletes = 0;
-  var pagesRemaining = true;
-  var pageIncoming = false;
-  var lastDocName;
+  let queue = [];
+  let numPendingDeletes = 0;
+  let pagesRemaining = true;
+  let pageIncoming = false;
+  let lastDocName;
 
-  var failures = [];
-  var retried = {};
+  let failures = [];
+  const retried = {};
 
-  var queueLoop = function() {
+  const queueLoop = function() {
     if (queue.length == 0 && numPendingDeletes == 0 && !pagesRemaining) {
       return true;
     }
@@ -313,10 +313,10 @@ FirestoreDelete.prototype._recursiveBatchDelete = function() {
       return false;
     }
 
-    var toDelete = [];
-    var numToDelete = Math.min(deleteBatchSize, queue.length);
+    const toDelete = [];
+    const numToDelete = Math.min(deleteBatchSize, queue.length);
 
-    for (var i = 0; i < numToDelete; i++) {
+    for (let i = 0; i < numToDelete; i++) {
       toDelete.push(queue.shift());
     }
 
@@ -376,10 +376,10 @@ FirestoreDelete.prototype._recursiveBatchDelete = function() {
  * @return {Promise} a promise for the entire operation.
  */
 FirestoreDelete.prototype._deletePath = function() {
-  var self = this;
-  var initialDelete;
+  const self = this;
+  let initialDelete;
   if (this.isDocumentPath) {
-    var doc = { name: this.root + "/" + this.path };
+    const doc = { name: this.root + "/" + this.path };
     initialDelete = firestore.deleteDocument(doc).catch(function(err) {
       logger.debug("deletePath:initialDelete:error", err);
       if (self.allDescendants) {
@@ -406,7 +406,7 @@ FirestoreDelete.prototype._deletePath = function() {
  * @return {Promise} a promise for all of the operations combined.
  */
 FirestoreDelete.prototype.deleteDatabase = function() {
-  var self = this;
+  const self = this;
   return firestore
     .listCollectionIds(this.project)
     .catch(function(err) {
@@ -414,13 +414,13 @@ FirestoreDelete.prototype.deleteDatabase = function() {
       return utils.reject("Unable to list collection IDs");
     })
     .then(function(collectionIds) {
-      var promises = [];
+      const promises = [];
 
       logger.info("Deleting the following collections: " + clc.cyan(collectionIds.join(", ")));
 
-      for (var i = 0; i < collectionIds.length; i++) {
-        var collectionId = collectionIds[i];
-        var deleteOp = new FirestoreDelete(self.project, collectionId, {
+      for (let i = 0; i < collectionIds.length; i++) {
+        const collectionId = collectionIds[i];
+        const deleteOp = new FirestoreDelete(self.project, collectionId, {
           recursive: true,
         });
 
@@ -448,7 +448,7 @@ FirestoreDelete.prototype.checkHasChildren = function() {
  * Run the delete operation.
  */
 FirestoreDelete.prototype.execute = function() {
-  var verifyRecurseSafe;
+  let verifyRecurseSafe;
   if (this.isDocumentPath && !this.recursive && !this.shallow) {
     verifyRecurseSafe = this.checkHasChildren().then(function(multiple) {
       if (multiple) {
@@ -459,7 +459,7 @@ FirestoreDelete.prototype.execute = function() {
     verifyRecurseSafe = Promise.resolve();
   }
 
-  var self = this;
+  const self = this;
   return verifyRecurseSafe.then(function() {
     return self._deletePath();
   });

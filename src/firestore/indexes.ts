@@ -129,7 +129,7 @@ export class FirestoreIndexes {
 
     // Ignore the default config, only list other fields.
     return fields.filter((field) => {
-      return field.name.indexOf("__default__") < 0;
+      return !field.name.includes("__default__");
     });
   }
 
@@ -399,7 +399,7 @@ export class FirestoreIndexes {
     // Confirms that the two objects have the same set of enabled indexes without
     // caring about specification order.
     for (const mode of fieldModes) {
-      if (specModes.indexOf(mode) < 0) {
+      if (!specModes.includes(mode)) {
         return false;
       }
     }

@@ -1,8 +1,8 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var MAX_POLL_RETRIES = 2;
+const MAX_POLL_RETRIES = 2;
 
 function pollOperation(op, pollFunction, interval, pollFailCount) {
   pollFailCount = pollFailCount || 0;

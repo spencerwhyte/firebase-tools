@@ -1,17 +1,17 @@
 "use strict";
 
-var clc = require("cli-color");
-var fs = require("fs");
+const clc = require("cli-color");
+const fs = require("fs");
 
-var api = require("./api");
-var utils = require("./utils");
+const api = require("./api");
+const utils = require("./utils");
 
-var prepareFirebaseRules = function(component, options, payload) {
-  var rulesFileName = component + ".rules";
-  var rulesPath = options.config.get(rulesFileName);
+const prepareFirebaseRules = function(component, options, payload) {
+  const rulesFileName = component + ".rules";
+  let rulesPath = options.config.get(rulesFileName);
   if (rulesPath) {
     rulesPath = options.config.path(rulesPath);
-    var src = fs.readFileSync(rulesPath, "utf8");
+    const src = fs.readFileSync(rulesPath, "utf8");
     utils.logBullet(clc.bold.cyan(component + ":") + " checking rules for compilation errors...");
     return api
       .request("POST", "/v1/projects/" + encodeURIComponent(options.project) + ":test", {
@@ -30,8 +30,8 @@ var prepareFirebaseRules = function(component, options, payload) {
       })
       .then(function(response) {
         if (response.body && response.body.issues && response.body.issues.length > 0) {
-          var add = response.body.issues.length === 1 ? "" : "s";
-          var message =
+          const add = response.body.issues.length === 1 ? "" : "s";
+          let message =
             "Compilation error" +
             add +
             " in " +

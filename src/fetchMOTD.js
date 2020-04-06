@@ -1,19 +1,19 @@
 "use strict";
-var logger = require("./logger");
-var request = require("request");
-var { configstore } = require("./configstore");
-var _ = require("lodash");
-var pkg = require("../package.json");
-var semver = require("semver");
-var clc = require("cli-color");
-var utils = require("./utils");
-var api = require("./api");
+const logger = require("./logger");
+const request = require("request");
+const { configstore } = require("./configstore");
+const _ = require("lodash");
+const pkg = require("../package.json");
+const semver = require("semver");
+const clc = require("cli-color");
+const utils = require("./utils");
+const api = require("./api");
 
-var ONE_DAY_MS = 1000 * 60 * 60 * 24;
+const ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
 module.exports = function() {
-  var motd = configstore.get("motd");
-  var motdFetched = configstore.get("motd.fetched") || 0;
+  let motd = configstore.get("motd");
+  const motdFetched = configstore.get("motd.fetched") || 0;
 
   if (motd && motdFetched > Date.now() - ONE_DAY_MS) {
     if (motd.minVersion && semver.gt(motd.minVersion, pkg.version)) {
@@ -30,7 +30,7 @@ module.exports = function() {
     }
 
     if (motd.message && process.stdout.isTTY) {
-      var lastMessage = configstore.get("motd.lastMessage");
+      const lastMessage = configstore.get("motd.lastMessage");
       if (lastMessage !== motd.message) {
         logger.info();
         logger.info(motd.message);

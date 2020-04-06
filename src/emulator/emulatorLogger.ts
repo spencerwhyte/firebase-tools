@@ -33,7 +33,7 @@ export enum Verbosity {
 
 export class EmulatorLogger {
   static verbosity: Verbosity = Verbosity.DEBUG;
-  static warnOnceCache = new Set<String>();
+  static warnOnceCache = new Set<string>();
 
   /**
    * Within this file, utils.logFoo() or logger.Foo() should not be called directly,
@@ -74,7 +74,7 @@ export class EmulatorLogger {
   }
 
   static handleRuntimeLog(log: EmulatorLog, ignore: string[] = []): void {
-    if (ignore.indexOf(log.level) >= 0) {
+    if (ignore.includes(log.level)) {
       return;
     }
     switch (log.level) {

@@ -1,12 +1,12 @@
 "use strict";
 
-var { Command } = require("../command");
-var requireInstance = require("../requireInstance");
-var { requirePermissions } = require("../requirePermissions");
-var api = require("../api");
-var utils = require("../utils");
-var { prompt } = require("../prompt");
-var clc = require("cli-color");
+const { Command } = require("../command");
+const requireInstance = require("../requireInstance");
+const { requirePermissions } = require("../requirePermissions");
+const api = require("../api");
+const utils = require("../utils");
+const { prompt } = require("../prompt");
+const clc = require("cli-color");
 
 module.exports = new Command("hosting:disable")
   .description("stop serving web traffic to your Firebase Hosting site")

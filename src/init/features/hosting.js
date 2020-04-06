@@ -1,21 +1,21 @@
 "use strict";
 
-var clc = require("cli-color");
-var fs = require("fs");
+const clc = require("cli-color");
+const fs = require("fs");
 
-var api = require("../../api");
-var logger = require("../../logger");
-var { prompt } = require("../../prompt");
+const api = require("../../api");
+const logger = require("../../logger");
+const { prompt } = require("../../prompt");
 
-var INDEX_TEMPLATE = fs.readFileSync(
+const INDEX_TEMPLATE = fs.readFileSync(
   __dirname + "/../../../templates/init/hosting/index.html",
   "utf8"
 );
-var MISSING_TEMPLATE = fs.readFileSync(
+const MISSING_TEMPLATE = fs.readFileSync(
   __dirname + "/../../../templates/init/hosting/404.html",
   "utf8"
 );
-var DEFAULT_IGNORES = ["firebase.json", "**/.*", "**/node_modules/**"];
+const DEFAULT_IGNORES = ["firebase.json", "**/.*", "**/node_modules/**"];
 
 module.exports = function(setup, config) {
   setup.hosting = {};
@@ -51,7 +51,7 @@ module.exports = function(setup, config) {
       ignore: DEFAULT_IGNORES,
     };
 
-    var next;
+    let next;
     if (setup.hosting.spa) {
       setup.config.hosting.rewrites = [{ source: "**", destination: "/index.html" }];
       next = Promise.resolve();

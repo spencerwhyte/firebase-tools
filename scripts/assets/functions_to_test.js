@@ -1,5 +1,5 @@
-var functions = require("firebase-functions");
-var admin = require("firebase-admin");
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
 
 exports.dbAction = functions.database.ref("/input/{uuid}").onCreate(function(snap, context) {
@@ -20,7 +20,7 @@ exports.httpsAction = functions.https.onRequest(function(req, res) {
 
 exports.pubsubAction = functions.pubsub.topic("topic1").onPublish(function(message) {
   console.log("Received message:", message);
-  var uuid = message.json;
+  const uuid = message.json;
   return admin
     .database()
     .ref("output/" + uuid)
@@ -29,7 +29,7 @@ exports.pubsubAction = functions.pubsub.topic("topic1").onPublish(function(messa
 
 exports.gcsAction = functions.storage.object().onFinalize(function(object) {
   console.log("Received object:", object);
-  var uuid = object.name;
+  const uuid = object.name;
   return admin
     .database()
     .ref("output/" + uuid)

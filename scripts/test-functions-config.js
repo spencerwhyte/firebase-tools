@@ -9,24 +9,24 @@
  * - projectId defaults to `functions-integration-test`
  */
 
-var clc = require("cli-color");
-var exec = require("child_process").exec;
-var execSync = require("child_process").execSync;
-var expect = require("chai").expect;
-var fs = require("fs-extra");
-var tmp = require("tmp");
+const clc = require("cli-color");
+const exec = require("child_process").exec;
+const execSync = require("child_process").execSync;
+const expect = require("chai").expect;
+const fs = require("fs-extra");
+const tmp = require("tmp");
 
-var api = require("../lib/api");
-var scopes = require("../lib/scopes");
-var { configstore } = require("../lib/configstore");
+const api = require("../lib/api");
+const scopes = require("../lib/scopes");
+const { configstore } = require("../lib/configstore");
 
-var projectId = process.argv[2] || "functions-integration-test";
-var localFirebase = __dirname + "/../lib/bin/firebase.js";
-var projectDir = __dirname + "/test-project";
-var tmpDir;
+const projectId = process.argv[2] || "functions-integration-test";
+const localFirebase = __dirname + "/../lib/bin/firebase.js";
+const projectDir = __dirname + "/test-project";
+let tmpDir;
 
-var preTest = function() {
-  var dir = tmp.dirSync({ prefix: "cfgtest_" });
+const preTest = function() {
+  const dir = tmp.dirSync({ prefix: "cfgtest_" });
   tmpDir = dir.name;
   fs.copySync(projectDir, tmpDir);
   api.setRefreshToken(configstore.get("tokens").refresh_token);
@@ -35,12 +35,12 @@ var preTest = function() {
   console.log("Done pretest prep.");
 };
 
-var postTest = function() {
+const postTest = function() {
   fs.remove(tmpDir);
   console.log("Done post-test cleanup.");
 };
 
-var set = function(expression) {
+const set = function(expression) {
   return new Promise(function(resolve) {
     exec(
       `${localFirebase} functions:config:set ${expression} --project=${projectId}`,
@@ -53,7 +53,7 @@ var set = function(expression) {
   });
 };
 
-var unset = function(key) {
+const unset = function(key) {
   return new Promise(function(resolve) {
     exec(
       `${localFirebase} functions:config:unset ${key} --project=${projectId}`,
@@ -66,7 +66,7 @@ var unset = function(key) {
   });
 };
 
-var getAndCompare = function(expected) {
+const getAndCompare = function(expected) {
   return new Promise(function(resolve) {
     exec(`${localFirebase} functions:config:get --project=${projectId}`, { cwd: tmpDir }, function(
       err,
@@ -78,7 +78,7 @@ var getAndCompare = function(expected) {
   });
 };
 
-var runTest = function(description, expression, key, expected) {
+const runTest = function(description, expression, key, expected) {
   return set(expression)
     .then(function() {
       return getAndCompare(expected);
@@ -91,7 +91,7 @@ var runTest = function(description, expression, key, expected) {
     });
 };
 
-var main = function() {
+const main = function() {
   preTest();
   runTest("string value", "foo.bar=faz", "foo", { foo: { bar: "faz" } })
     .then(function() {

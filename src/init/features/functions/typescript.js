@@ -1,25 +1,25 @@
 "use strict";
 
-var _ = require("lodash");
-var fs = require("fs");
-var path = require("path");
+const _ = require("lodash");
+const fs = require("fs");
+const path = require("path");
 
-var npmDependencies = require("./npm-dependencies");
-var { prompt } = require("../../../prompt");
+const npmDependencies = require("./npm-dependencies");
+const { prompt } = require("../../../prompt");
 
-var TEMPLATE_ROOT = path.resolve(__dirname, "../../../../templates/init/functions/typescript/");
-var PACKAGE_LINTING_TEMPLATE = fs.readFileSync(
+const TEMPLATE_ROOT = path.resolve(__dirname, "../../../../templates/init/functions/typescript/");
+const PACKAGE_LINTING_TEMPLATE = fs.readFileSync(
   path.join(TEMPLATE_ROOT, "package.lint.json"),
   "utf8"
 );
-var PACKAGE_NO_LINTING_TEMPLATE = fs.readFileSync(
+const PACKAGE_NO_LINTING_TEMPLATE = fs.readFileSync(
   path.join(TEMPLATE_ROOT, "package.nolint.json"),
   "utf8"
 );
-var TSLINT_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "tslint.json"), "utf8");
-var TSCONFIG_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "tsconfig.json"), "utf8");
-var INDEX_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "index.ts"), "utf8");
-var GITIGNORE_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "_gitignore"), "utf8");
+const TSLINT_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "tslint.json"), "utf8");
+const TSCONFIG_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "tsconfig.json"), "utf8");
+const INDEX_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "index.ts"), "utf8");
+const GITIGNORE_TEMPLATE = fs.readFileSync(path.join(TEMPLATE_ROOT, "_gitignore"), "utf8");
 
 module.exports = function(setup, config) {
   return prompt(setup.functions, [

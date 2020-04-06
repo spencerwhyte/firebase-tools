@@ -1,33 +1,33 @@
 "use strict";
 
-var { Command } = require("../command");
-var { configstore } = require("../configstore");
-var logger = require("../logger");
-var clc = require("cli-color");
+const { Command } = require("../command");
+const { configstore } = require("../configstore");
+const logger = require("../logger");
+const clc = require("cli-color");
 
-var utils = require("../utils");
-var api = require("../api");
-var auth = require("../auth");
-var _ = require("lodash");
+const utils = require("../utils");
+const api = require("../api");
+const auth = require("../auth");
+const _ = require("lodash");
 
 module.exports = new Command("logout")
   .description("log the CLI out of Firebase")
   .action(function(options) {
-    var user = configstore.get("user");
-    var tokens = configstore.get("tokens");
-    var currentToken = _.get(tokens, "refresh_token");
-    var token = utils.getInheritedOption(options, "token") || currentToken;
+    const user = configstore.get("user");
+    const tokens = configstore.get("tokens");
+    const currentToken = _.get(tokens, "refresh_token");
+    const token = utils.getInheritedOption(options, "token") || currentToken;
     api.setRefreshToken(token);
-    var next;
+    let next;
     if (token) {
       next = auth.logout(token);
     } else {
       next = Promise.resolve();
     }
 
-    var cleanup = function() {
+    const cleanup = function() {
       if (token || user || tokens) {
-        var msg = "Logged out";
+        let msg = "Logged out";
         if (token === currentToken) {
           if (user) {
             msg += " from " + clc.bold(user.email);

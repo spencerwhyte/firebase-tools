@@ -1,15 +1,15 @@
 "use strict";
 
-var _ = require("lodash");
+const _ = require("lodash");
 
-var clc = require("cli-color");
-var { Command } = require("../command");
-var functionsConfig = require("../functionsConfig");
-var getProjectId = require("../getProjectId");
-var logger = require("../logger");
-var { requirePermissions } = require("../requirePermissions");
-var utils = require("../utils");
-var runtimeconfig = require("../gcp/runtimeconfig");
+const clc = require("cli-color");
+const { Command } = require("../command");
+const functionsConfig = require("../functionsConfig");
+const getProjectId = require("../getProjectId");
+const logger = require("../logger");
+const { requirePermissions } = require("../requirePermissions");
+const utils = require("../utils");
+const runtimeconfig = require("../gcp/runtimeconfig");
 
 module.exports = new Command("functions:config:unset [keys...]")
   .description("unset environment config at the specified path(s)")
@@ -30,8 +30,8 @@ module.exports = new Command("functions:config:unset [keys...]")
     if (!args.length) {
       return utils.reject("Must supply at least one key");
     }
-    var projectId = getProjectId(options);
-    var parsed = functionsConfig.parseUnsetArgs(args);
+    const projectId = getProjectId(options);
+    const parsed = functionsConfig.parseUnsetArgs(args);
     return Promise.all(
       _.map(parsed, function(item) {
         if (item.varId === "") {

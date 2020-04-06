@@ -18,7 +18,7 @@ import { FunctionsExecutionMode } from "../../emulator/types";
  * It automatically fails or succeeds 10ms after being given work to do.
  */
 class MockRuntimeInstance implements FunctionsRuntimeInstance {
-  pid: number = 12345;
+  pid = 12345;
   metadata: { [key: string]: any } = {};
   events: EventEmitter = new EventEmitter();
   exit: Promise<number>;

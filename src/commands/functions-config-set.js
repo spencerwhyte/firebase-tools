@@ -1,13 +1,13 @@
 "use strict";
 
-var clc = require("cli-color");
+const clc = require("cli-color");
 
-var { Command } = require("../command");
-var getProjectId = require("../getProjectId");
-var { requirePermissions } = require("../requirePermissions");
-var logger = require("../logger");
-var utils = require("../utils");
-var functionsConfig = require("../functionsConfig");
+const { Command } = require("../command");
+const getProjectId = require("../getProjectId");
+const { requirePermissions } = require("../requirePermissions");
+const logger = require("../logger");
+const utils = require("../utils");
+const functionsConfig = require("../functionsConfig");
 
 module.exports = new Command("functions:config:set [values...]")
   .description("set environment config with key=value syntax")
@@ -30,9 +30,9 @@ module.exports = new Command("functions:config:set [values...]")
         "Must supply at least one key/value pair, e.g. " + clc.bold('app.name="My App"')
       );
     }
-    var projectId = getProjectId(options);
-    var parsed = functionsConfig.parseSetArgs(args);
-    var promises = [];
+    const projectId = getProjectId(options);
+    const parsed = functionsConfig.parseSetArgs(args);
+    const promises = [];
 
     parsed.forEach(function(item) {
       promises.push(

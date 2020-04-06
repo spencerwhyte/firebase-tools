@@ -1,27 +1,27 @@
 "use strict";
 
-var fs = require("fs");
-var _ = require("lodash");
-var ora = require("ora");
-var readline = require("readline");
-var request = require("request");
+const fs = require("fs");
+const _ = require("lodash");
+const ora = require("ora");
+const readline = require("readline");
+const request = require("request");
 
-var tmp = require("tmp");
+const tmp = require("tmp");
 
-var api = require("./api");
-var utils = require("./utils");
-var ProfileReport = require("./profileReport");
-var { FirebaseError } = require("./error");
-var responseToError = require("./responseToError");
+const api = require("./api");
+const utils = require("./utils");
+const ProfileReport = require("./profileReport");
+const { FirebaseError } = require("./error");
+const responseToError = require("./responseToError");
 
 module.exports = function(options) {
-  var url = utils.addSubdomain(api.realtimeOrigin, options.instance) + "/.settings/profile.json?";
+  const url = utils.addSubdomain(api.realtimeOrigin, options.instance) + "/.settings/profile.json?";
 
-  var rl = readline.createInterface({
+  const rl = readline.createInterface({
     input: process.stdin,
   });
 
-  var reqOptions = {
+  const reqOptions = {
     url: url,
     headers: {
       Accept: "text/event-stream",
@@ -30,27 +30,27 @@ module.exports = function(options) {
 
   return api.addRequestHeaders(reqOptions).then(function(reqOptionsWithToken) {
     return new Promise(function(resolve, reject) {
-      var fileOut = !!options.output;
-      var tmpFile = tmp.tmpNameSync();
-      var tmpStream = fs.createWriteStream(tmpFile);
-      var outStream = fileOut ? fs.createWriteStream(options.output) : process.stdout;
-      var counter = 0;
-      var spinner = ora({
+      const fileOut = !!options.output;
+      const tmpFile = tmp.tmpNameSync();
+      const tmpStream = fs.createWriteStream(tmpFile);
+      const outStream = fileOut ? fs.createWriteStream(options.output) : process.stdout;
+      let counter = 0;
+      const spinner = ora({
         text: "0 operations recorded. Press [enter] to stop",
         color: "yellow",
       });
-      var outputFormat = options.raw ? "RAW" : options.parent.json ? "JSON" : "TXT"; // eslint-disable-line no-nested-ternary
-      var erroring;
-      var errorResponse = "";
-      var response;
+      const outputFormat = options.raw ? "RAW" : options.parent.json ? "JSON" : "TXT"; // eslint-disable-line no-nested-ternary
+      let erroring;
+      let errorResponse = "";
+      let response;
 
-      var generateReport = _.once(function() {
+      const generateReport = _.once(function() {
         rl.close();
         spinner.stop();
         if (erroring) {
           fs.unlinkSync(tmpFile);
           try {
-            var data = JSON.parse(errorResponse);
+            const data = JSON.parse(errorResponse);
             return reject(responseToError(response, data));
           } catch (e) {
             // If it wasn't JSON, then it was a text response, technically it should always
@@ -66,14 +66,14 @@ module.exports = function(options) {
           response.destroy();
           response = null;
         }
-        var dataFile = options.input || tmpFile;
-        var reportOptions = {
+        const dataFile = options.input || tmpFile;
+        const reportOptions = {
           format: outputFormat,
           isFile: fileOut,
           isInput: !!options.input,
           collapse: options.collapse,
         };
-        var report = new ProfileReport(dataFile, outStream, reportOptions);
+        const report = new ProfileReport(dataFile, outStream, reportOptions);
         report.generate().then(
           function(result) {
             fs.unlinkSync(tmpFile);

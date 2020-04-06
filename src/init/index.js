@@ -1,14 +1,14 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
+const _ = require("lodash");
+const clc = require("cli-color");
 
-var logger = require("../logger");
-var features = require("./features");
-var utils = require("../utils");
+const logger = require("../logger");
+const features = require("./features");
+const utils = require("../utils");
 
 var init = function(setup, config, options) {
-  var nextFeature = setup.features.shift();
+  const nextFeature = setup.features.shift();
   if (nextFeature) {
     if (!features[nextFeature]) {
       return utils.reject(

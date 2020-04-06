@@ -119,14 +119,14 @@ export function shouldStart(options: any, name: Emulators): boolean {
     return (
       previews.emulatorgui &&
       !!options.project &&
-      targets.some((target) => EMULATORS_SUPPORTED_BY_GUI.indexOf(target) >= 0)
+      targets.some((target) => EMULATORS_SUPPORTED_BY_GUI.includes(target))
     );
   }
 
-  return targets.indexOf(name) >= 0;
+  return targets.includes(name);
 }
 
-export async function startAll(options: any, noGui: boolean = false): Promise<void> {
+export async function startAll(options: any, noGui = false): Promise<void> {
   // Emulators config is specified in firebase.json as:
   // "emulators": {
   //   "firestore": {

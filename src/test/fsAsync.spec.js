@@ -1,16 +1,16 @@
 "use strict";
 
-var crypto = require("crypto");
-var fs = require("fs");
-var os = require("os");
-var path = require("path");
+const crypto = require("crypto");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 
-var fsAsync = require("../fsAsync");
+const fsAsync = require("../fsAsync");
 
-var chai = require("chai");
-var _ = require("lodash");
+const chai = require("chai");
+const _ = require("lodash");
 
-var expect = chai.expect;
+const expect = chai.expect;
 
 // These tests work on the following directory structure:
 // <basedir>
@@ -25,8 +25,8 @@ var expect = chai.expect;
 //   node_modules
 //     subfile
 describe("fsAsync", function() {
-  var baseDir;
-  var files = [
+  let baseDir;
+  const files = [
     ".hidden",
     "visible",
     "subdir/subfile",
@@ -54,19 +54,19 @@ describe("fsAsync", function() {
   });
 
   it("can recurse directories", function() {
-    var foundFiles = fsAsync.readdirRecursive({ path: baseDir }).then(function(results) {
+    const foundFiles = fsAsync.readdirRecursive({ path: baseDir }).then(function(results) {
       return _.map(results, function(result) {
         return result.name;
       }).sort();
     });
-    var expectFiles = _.map(files, function(file) {
+    const expectFiles = _.map(files, function(file) {
       return path.join(baseDir, file);
     }).sort();
     return expect(foundFiles).to.eventually.deep.equal(expectFiles);
   });
 
   it("can ignore directories", function() {
-    var expected = _.chain(files)
+    const expected = _.chain(files)
       .reject(function(file) {
         return file.indexOf("node_modules") !== -1;
       })
@@ -76,7 +76,7 @@ describe("fsAsync", function() {
       .value()
       .sort();
 
-    var promise = fsAsync
+    const promise = fsAsync
       .readdirRecursive({
         path: baseDir,
         ignore: ["node_modules"],
@@ -91,7 +91,7 @@ describe("fsAsync", function() {
   });
 
   it("supports blob rules", function() {
-    var expected = _.chain(files)
+    const expected = _.chain(files)
       .reject(function(file) {
         return file.indexOf("node_modules") !== -1;
       })
@@ -101,7 +101,7 @@ describe("fsAsync", function() {
       .value()
       .sort();
 
-    var promise = fsAsync
+    const promise = fsAsync
       .readdirRecursive({
         path: baseDir,
         ignore: ["**/node_modules/**"],
@@ -116,7 +116,7 @@ describe("fsAsync", function() {
   });
 
   it("should support negation rules", function() {
-    var expected = _.chain(files)
+    const expected = _.chain(files)
       .filter(function(file) {
         return file === "visible";
       })
@@ -126,7 +126,7 @@ describe("fsAsync", function() {
       .value()
       .sort();
 
-    var promise = fsAsync
+    const promise = fsAsync
       .readdirRecursive({
         path: baseDir,
         ignore: ["!visible"],

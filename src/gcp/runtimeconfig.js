@@ -1,12 +1,12 @@
 "use strict";
 
-var api = require("../api");
+const api = require("../api");
 
-var utils = require("../utils");
-var logger = require("../logger");
-var _ = require("lodash");
+const utils = require("../utils");
+const logger = require("../logger");
+const _ = require("lodash");
 
-var API_VERSION = "v1beta1";
+const API_VERSION = "v1beta1";
 
 function _listConfigs(projectId) {
   return api
@@ -21,8 +21,8 @@ function _listConfigs(projectId) {
 }
 
 function _createConfig(projectId, configId) {
-  var path = _.join(["projects", projectId, "configs"], "/");
-  var endpoint = utils.endpoint([API_VERSION, path]);
+  const path = _.join(["projects", projectId, "configs"], "/");
+  const endpoint = utils.endpoint([API_VERSION, path]);
   return api
     .request("POST", endpoint, {
       auth: true,
@@ -82,8 +82,8 @@ function _getVariable(varPath) {
 }
 
 function _createVariable(projectId, configId, varId, value) {
-  var path = _.join(["projects", projectId, "configs", configId, "variables"], "/");
-  var endpoint = utils.endpoint([API_VERSION, path]);
+  const path = _.join(["projects", projectId, "configs", configId, "variables"], "/");
+  const endpoint = utils.endpoint([API_VERSION, path]);
   return api
     .request("POST", endpoint, {
       auth: true,
@@ -106,8 +106,8 @@ function _createVariable(projectId, configId, varId, value) {
 }
 
 function _updateVariable(projectId, configId, varId, value) {
-  var path = _.join(["projects", projectId, "configs", configId, "variables", varId], "/");
-  var endpoint = utils.endpoint([API_VERSION, path]);
+  const path = _.join(["projects", projectId, "configs", configId, "variables", varId], "/");
+  const endpoint = utils.endpoint([API_VERSION, path]);
   return api.request("PUT", endpoint, {
     auth: true,
     origin: api.runtimeconfigOrigin,
@@ -119,7 +119,7 @@ function _updateVariable(projectId, configId, varId, value) {
   });
 }
 function _setVariable(projectId, configId, varId, value) {
-  var path = _.join(["projects", projectId, "configs", configId, "variables", varId], "/");
+  const path = _.join(["projects", projectId, "configs", configId, "variables", varId], "/");
   return _getVariable(path)
     .then(function() {
       return _updateVariable(projectId, configId, varId, value);
@@ -133,7 +133,7 @@ function _setVariable(projectId, configId, varId, value) {
 }
 
 function _deleteVariable(projectId, configId, varId) {
-  var endpoint =
+  const endpoint =
     utils.endpoint([API_VERSION, "projects", projectId, "configs", configId, "variables", varId]) +
     "?recursive=true";
   return api

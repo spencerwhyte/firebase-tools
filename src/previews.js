@@ -1,9 +1,9 @@
 "use strict";
 
-var _ = require("lodash");
-var { configstore } = require("./configstore");
+let _ = require("lodash");
+let { configstore } = require("./configstore");
 
-var previews = _.assign(
+let previews = _.assign(
   {
     // insert previews here...
     rtdbrules: false,

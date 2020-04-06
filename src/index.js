@@ -1,11 +1,11 @@
 "use strict";
 
-var program = require("commander");
-var pkg = require("../package.json");
-var clc = require("cli-color");
-var logger = require("./logger");
-var { setupLoggers } = require("./utils");
-var didYouMean = require("didyoumean");
+let program = require("commander");
+let pkg = require("../package.json");
+let clc = require("cli-color");
+let logger = require("./logger");
+let { setupLoggers } = require("./utils");
+let didYouMean = require("didyoumean");
 
 program.version(pkg.version);
 program.option(
@@ -18,12 +18,12 @@ program.option("--non-interactive", "error out of the command instead of waiting
 program.option("-i, --interactive", "force prompts to be displayed");
 program.option("--debug", "print verbose debug output and keep a debug log file");
 
-var client = {};
+let client = {};
 client.cli = program;
 client.logger = require("./logger");
 client.errorOut = require("./errorOut").errorOut;
 client.getCommand = function(name) {
-  for (var i = 0; i < client.cli.commands.length; i++) {
+  for (let i = 0; i < client.cli.commands.length; i++) {
     if (client.cli.commands[i]._name === name) {
       return client.cli.commands[i];
     }
@@ -41,7 +41,7 @@ require("./commands")(client);
  * @return {string|undefined} Returns the suggested command; undefined if none.
  */
 function suggestCommands(cmd, cmdList) {
-  var suggestion = didYouMean(cmd, cmdList);
+  let suggestion = didYouMean(cmd, cmdList);
   if (suggestion) {
     logger.error();
     logger.error("Did you mean " + clc.bold(suggestion) + "?");
@@ -49,11 +49,11 @@ function suggestCommands(cmd, cmdList) {
   }
 }
 
-var commandNames = program.commands.map(function(cmd) {
+let commandNames = program.commands.map(function(cmd) {
   return cmd._name;
 });
 
-var RENAMED_COMMANDS = {
+let RENAMED_COMMANDS = {
   "delete-site": "hosting:disable",
   "disable:hosting": "hosting:disable",
   "data:get": "database:get",
@@ -70,7 +70,7 @@ var RENAMED_COMMANDS = {
 program.action(function(_, args) {
   setupLoggers();
 
-  var cmd = args[0];
+  let cmd = args[0];
   logger.error(clc.bold.red("Error:"), clc.bold(cmd), "is not a Firebase command");
 
   if (RENAMED_COMMANDS[cmd]) {

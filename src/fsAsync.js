@@ -1,9 +1,9 @@
 "use strict";
 
-var fs = require("fs");
-var _ = require("lodash");
-var path = require("path");
-var minimatch = require("minimatch");
+const fs = require("fs");
+const _ = require("lodash");
+const path = require("path");
+const minimatch = require("minimatch");
 
 // resolver creates a promise resolver for an errback
 function resolver(resolve, reject) {
@@ -17,7 +17,7 @@ function resolver(resolve, reject) {
 
 function readdir(location) {
   return new Promise(function(resolve, reject) {
-    var done = resolver(resolve, reject);
+    const done = resolver(resolve, reject);
     // In earlier versions of Node, fs.readdir was a two param function;
     // later versions of Node introduced an options parameter in between
     // the path and callback.
@@ -50,7 +50,7 @@ function rmdir(location) {
 function _readdirRecursive(options) {
   return readdir(options.path)
     .then(function(dirContents) {
-      var work = _.chain(dirContents)
+      const work = _.chain(dirContents)
         .map(function(shortName) {
           return path.join(options.path, shortName);
         })
@@ -89,11 +89,11 @@ function _readdirRecursive(options) {
 // @param options.ignore files to ignore
 // @returns array of {name, mode} for files that match
 function readdirRecursive(options) {
-  var mmopts = { matchBase: true, dot: true };
-  var rules = _.map(options.ignore || [], function(glob) {
+  const mmopts = { matchBase: true, dot: true };
+  const rules = _.map(options.ignore || [], function(glob) {
     return minimatch.filter(glob, mmopts);
   });
-  var filter = function(test) {
+  const filter = function(test) {
     return _.some(rules, function(rule) {
       return rule(test);
     });
@@ -106,7 +106,7 @@ function readdirRecursive(options) {
 
 function rmdirRecursive(location) {
   return readdir(location).then(function(dirContents) {
-    var cleanThisDir = Promise.all(
+    const cleanThisDir = Promise.all(
       _.map(dirContents, function(file) {
         file = path.join(location, file);
         return stat(file).then(function(fstat) {

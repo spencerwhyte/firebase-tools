@@ -1,24 +1,24 @@
 "use strict";
 
-var _ = require("lodash");
-var clc = require("cli-color");
-var cjson = require("cjson");
-var fs = require("fs");
-var path = require("path");
+const _ = require("lodash");
+const clc = require("cli-color");
+const cjson = require("cjson");
+const fs = require("fs");
+const path = require("path");
 
-var detectProjectRoot = require("./detectProjectRoot").detectProjectRoot;
-var { FirebaseError } = require("./error");
-var fsutils = require("./fsutils");
-var utils = require("./utils");
+const detectProjectRoot = require("./detectProjectRoot").detectProjectRoot;
+const { FirebaseError } = require("./error");
+const fsutils = require("./fsutils");
+const utils = require("./utils");
 
 // "exclusive" target implies that a resource can only be assigned a single target name
-var TARGET_TYPES = {
+const TARGET_TYPES = {
   storage: { resource: "bucket", exclusive: true },
   database: { resource: "instance", exclusive: true },
   hosting: { resource: "site", exclusive: true },
 };
 
-var RC = function(rcpath, data) {
+const RC = function(rcpath, data) {
   this.path = rcpath;
   this.data = data || {};
 };
@@ -77,12 +77,12 @@ RC.prototype = {
       resources = [resources];
     }
 
-    var changed = [];
+    const changed = [];
 
     // remove resources from existing targets
     resources.forEach(
       function(resource) {
-        var cur = this.findTarget(project, type, resource);
+        const cur = this.findTarget(project, type, resource);
         if (cur && cur !== targetName) {
           this.unsetTargetResource(project, type, cur, resource);
           changed.push({ resource: resource, target: cur });
@@ -91,8 +91,8 @@ RC.prototype = {
     );
 
     // apply resources to new target
-    var existing = this.get(["targets", project, type, targetName], []);
-    var list = _.uniq(existing.concat(resources)).sort();
+    const existing = this.get(["targets", project, type, targetName], []);
+    const list = _.uniq(existing.concat(resources)).sort();
     this.set(["targets", project, type, targetName], list);
 
     this.save();
@@ -100,7 +100,7 @@ RC.prototype = {
   },
 
   removeTarget: function(project, type, resource) {
-    var name = this.findTarget(project, type, resource);
+    const name = this.findTarget(project, type, resource);
     if (!name) {
       return null;
     }
@@ -111,7 +111,7 @@ RC.prototype = {
   },
 
   clearTarget: function(project, type, name) {
-    var exists = this.target(project, type, name).length > 0;
+    const exists = this.target(project, type, name).length > 0;
     if (!exists) {
       return false;
     }
@@ -124,8 +124,8 @@ RC.prototype = {
    * Finds a target name for the specified type and resource.
    */
   findTarget: function(project, type, resource) {
-    var targets = this.get(["targets", project, type]);
-    for (var targetName in targets) {
+    const targets = this.get(["targets", project, type]);
+    for (const targetName in targets) {
       if (_.includes(targets[targetName], resource)) {
         return targetName;
       }
@@ -138,8 +138,8 @@ RC.prototype = {
    * not persist the result.
    */
   unsetTargetResource: function(project, type, name, resource) {
-    var targetPath = ["targets", project, type, name];
-    var updatedResources = this.get(targetPath, []).filter(function(r) {
+    const targetPath = ["targets", project, type, name];
+    const updatedResources = this.get(targetPath, []).filter(function(r) {
       return r !== resource;
     });
 
@@ -155,7 +155,7 @@ RC.prototype = {
    * the specified project.
    */
   requireTarget: function(project, type, name) {
-    var target = this.target(project, type, name);
+    const target = this.target(project, type, name);
     if (!target.length) {
       throw new FirebaseError(
         "Deploy target " +
@@ -189,7 +189,7 @@ RC.prototype = {
 };
 
 RC.loadFile = function(rcpath) {
-  var data = {};
+  let data = {};
   if (fsutils.fileExistsSync(rcpath)) {
     try {
       data = cjson.load(rcpath);
@@ -203,8 +203,8 @@ RC.loadFile = function(rcpath) {
 
 RC.load = function(cwd) {
   cwd = cwd || process.cwd();
-  var dir = detectProjectRoot(cwd);
-  var potential = path.resolve(dir || cwd, "./.firebaserc");
+  const dir = detectProjectRoot(cwd);
+  const potential = path.resolve(dir || cwd, "./.firebaserc");
   return RC.loadFile(potential);
 };
 

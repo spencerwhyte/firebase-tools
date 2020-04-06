@@ -5,8 +5,8 @@
 
 var extractTriggers = function(mod, triggers, prefix) {
   prefix = prefix || "";
-  for (var funcName of Object.keys(mod)) {
-    var child = mod[funcName];
+  for (const funcName of Object.keys(mod)) {
+    const child = mod[funcName];
     if (typeof child === "function" && child.__trigger && typeof child.__trigger === "object") {
       if (funcName.indexOf("-") >= 0) {
         throw new Error(
@@ -14,8 +14,8 @@ var extractTriggers = function(mod, triggers, prefix) {
         );
       }
 
-      var trigger = {};
-      for (var key of Object.keys(child.__trigger)) {
+      const trigger = {};
+      for (const key of Object.keys(child.__trigger)) {
         trigger[key] = child.__trigger[key];
       }
       trigger.name = prefix + funcName;

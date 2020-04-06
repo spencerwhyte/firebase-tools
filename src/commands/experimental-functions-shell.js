@@ -1,9 +1,9 @@
 "use strict";
 
-var { Command } = require("../command");
-var { requirePermissions } = require("../requirePermissions");
-var action = require("../functionsShellCommandAction");
-var requireConfig = require("../requireConfig");
+const { Command } = require("../command");
+const { requirePermissions } = require("../requirePermissions");
+const action = require("../functionsShellCommandAction");
+const requireConfig = require("../requireConfig");
 
 module.exports = new Command("experimental:functions:shell")
   .description(
