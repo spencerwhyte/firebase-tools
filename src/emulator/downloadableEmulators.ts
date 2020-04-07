@@ -16,6 +16,7 @@ import * as clc from "cli-color";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as os from "os";
+import { performance }  from "perf_hooks";
 
 // tslint:disable-next-line
 const downloadEmulator = require("../emulator/download");
@@ -297,7 +298,7 @@ export async function stop(targetName: DownloadableEmulators): Promise<void> {
       let startedToExitAt = performance.now();
       emulator.instance.once("exit", () => {
         let finishedExitAt = performance.now();
-        logger.debug(Constants.description(emulator.name) + ": Took " + (finishedExitAt - startedToExitAt) + " ms to exit the emulator");
+        utils.logLabeledBullet("emulators", Constants.description(emulator.name) + ": Took " + (finishedExitAt - startedToExitAt) + " ms to exit the emulator");
         clearTimeout(killTimeout);
         resolve();
       });
