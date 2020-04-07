@@ -20,7 +20,7 @@ import * as os from "os";
 // tslint:disable-next-line
 const downloadEmulator = require("../emulator/download");
 
-const EMULATOR_INSTANCE_KILL_TIMEOUT = 2000; /* ms */
+const EMULATOR_INSTANCE_KILL_TIMEOUT = 60000; /* ms */
 
 const CACHE_DIR =
   process.env.FIREBASE_EMULATORS_PATH || path.join(os.homedir(), ".cache", "firebase", "emulators");
@@ -294,7 +294,10 @@ export async function stop(targetName: DownloadableEmulators): Promise<void> {
         reject(new FirebaseError(emulator.name + ": " + errorMsg));
       }, EMULATOR_INSTANCE_KILL_TIMEOUT);
 
+      let startedToExitAt = performance.now();
       emulator.instance.once("exit", () => {
+        let finishedExitAt = performance.now();
+        logger.debug(Constants.description(emulator.name) + ": Took " + (finishedExitAt - startedToExitAt) + " ms to exit the emulator");
         clearTimeout(killTimeout);
         resolve();
       });

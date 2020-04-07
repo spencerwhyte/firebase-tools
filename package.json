@@ -1,5 +1,5 @@
 {
-  "name": "firebase-tools",
+  "name": "@spencerwhyte/firebase-tools",
   "version": "8.0.2",
   "description": "Command-Line Interface for Firebase",
   "main": "./lib/index.js",
@@ -49,9 +49,6 @@
     "url": "https://github.com/firebase/firebase-tools/issues"
   },
   "homepage": "https://github.com/firebase/firebase-tools",
-  "publishConfig": {
-    "registry": "https://wombat-dressing-room.appspot.com"
-  },
   "nyc": {
     "require": [
       "ts-node/register"
